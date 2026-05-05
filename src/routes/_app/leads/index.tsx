@@ -1,4 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -22,12 +24,24 @@ export const Route = createFileRoute("/_app/leads/")({ component: LeadsList });
 function LeadsList() {
   const qc = useQueryClient();
   const nav = useNavigate();
+  const sp = useSearch({ strict: false }) as any;
+  const { user } = useAuth();
   const [view, setView] = useState<"list" | "board">("list");
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("");
   const [tempFilter, setTempFilter] = useState("");
+  const [ownerMe, setOwnerMe] = useState(false);
+  const [openOnly, setOpenOnly] = useState(false);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ lead_name: "", company_name: "", email: "", mobile: "", interest_notes: "" });
+
+  useEffect(() => {
+    if (sp?.owner === "me") setOwnerMe(true);
+    if (sp?.open === "1" || sp?.open === 1) setOpenOnly(true);
+    if (sp?.stage) setStageFilter(String(sp.stage));
+    if (sp?.temperature) setTempFilter(String(sp.temperature));
+  }, [sp?.owner, sp?.open, sp?.stage, sp?.temperature]);
+
 
   const { data: stages = [] } = useLookup("lead_stages", { orderBy: "sort_order" });
   const { data: temps = [] } = useLookup("lead_temperatures", { orderBy: "sort_order" });
@@ -59,9 +73,12 @@ function LeadsList() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const openStatusId = (statuses as any[]).find((s) => s.code === "OPEN")?.id;
   const filtered = (rows as any[]).filter((r) => {
     if (stageFilter && r.lead_stage_id !== stageFilter) return false;
     if (tempFilter && r.qualification_temperature_id !== tempFilter) return false;
+    if (ownerMe && user?.id && r.owner_id !== user.id) return false;
+    if (openOnly && openStatusId && r.lead_status_id !== openStatusId) return false;
     if (search && !`${r.lead_name} ${r.company_name ?? ""} ${r.email ?? ""} ${r.record_number ?? ""}`.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -109,6 +126,12 @@ function LeadsList() {
             <option value="">All temperatures</option>
             {(temps as any[]).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          <label className="flex items-center gap-1.5 text-xs px-2 h-9 border rounded bg-background cursor-pointer">
+            <input type="checkbox" checked={ownerMe} onChange={(e) => setOwnerMe(e.target.checked)} /> Mine
+          </label>
+          <label className="flex items-center gap-1.5 text-xs px-2 h-9 border rounded bg-background cursor-pointer">
+            <input type="checkbox" checked={openOnly} onChange={(e) => setOpenOnly(e.target.checked)} /> Open only
+          </label>
         </FilterBar>
         {view === "list" ? (
           <div className="bg-card border rounded-lg">

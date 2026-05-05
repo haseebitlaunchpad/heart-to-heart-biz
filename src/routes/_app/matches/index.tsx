@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -28,6 +29,14 @@ function MatchesList() {
   const [form, setForm] = useState<any>({ lead_id: "", account_id: "", catalog_opportunity_id: "", notes: "" });
 
   const { data: statuses = [] } = useLookup("match_statuses", { orderBy: "sort_order" });
+  const sp = useSearch({ strict: false }) as any;
+  useEffect(() => {
+    if (sp?.status && (statuses as any[]).length) {
+      const code = String(sp.status).toUpperCase();
+      const found = (statuses as any[]).find((s) => s.code?.toUpperCase() === code || s.code?.toUpperCase().includes(code));
+      if (found) setStatusFilter(found.id);
+    }
+  }, [sp?.status, (statuses as any[]).length]);
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["matches"],
