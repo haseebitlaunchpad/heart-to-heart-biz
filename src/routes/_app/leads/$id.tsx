@@ -261,9 +261,23 @@ function SubmitApprovalDialog({ open, onOpenChange, objectType, objectId }: { op
 
 
 function MatchesPanel({ leadId }: { leadId: string }) {
+  // Pull linked account so we also surface matches created post-conversion under the account
+  const { data: lead } = useQuery({
+    queryKey: ["lead-mini", leadId],
+    queryFn: async () => (await supabase.from("leads").select("linked_account_id, converted_account_id").eq("id", leadId).maybeSingle()).data,
+  });
+  const accountId = lead?.linked_account_id ?? lead?.converted_account_id ?? null;
   const { data = [] } = useQuery({
-    queryKey: ["lead-matches", leadId],
-    queryFn: async () => (await supabase.from("opportunity_matches").select("*, opportunity_catalog(title), match_statuses(name,color)").eq("lead_id", leadId)).data ?? [],
+    queryKey: ["lead-matches", leadId, accountId],
+    queryFn: async () => {
+      const filters = [`lead_id.eq.${leadId}`];
+      if (accountId) filters.push(`account_id.eq.${accountId}`);
+      const { data } = await supabase
+        .from("opportunity_matches")
+        .select("*, opportunity_catalog(title), match_statuses(name,color)")
+        .or(filters.join(","));
+      return data ?? [];
+    },
   });
   if (!data.length) return <div className="text-sm text-muted-foreground p-6 text-center">No matches.</div>;
   return (
