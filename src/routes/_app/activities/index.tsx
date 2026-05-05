@@ -27,6 +27,10 @@ function ActivitiesPage() {
   });
   const filtered = (rows as any[]).filter((r) => {
     if (typeId && r.activity_type_id !== typeId) return false;
+    if (overdueOnly) {
+      if (r.completed_at) return false;
+      if (!r.due_date || new Date(r.due_date) >= new Date()) return false;
+    }
     if (search && !`${r.subject} ${r.description ?? ""} ${r.record_number ?? ""}`.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -54,6 +58,9 @@ function ActivitiesPage() {
             <option value="">All types</option>
             {(types as any[]).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
+          <label className="flex items-center gap-1.5 text-xs px-2 h-9 border rounded bg-background cursor-pointer">
+            <input type="checkbox" checked={overdueOnly} onChange={(e) => setOverdueOnly(e.target.checked)} /> Overdue only
+          </label>
         </FilterBar>
         <Timeline items={items} />
       </div>
