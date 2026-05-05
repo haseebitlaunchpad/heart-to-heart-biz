@@ -12,6 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppMatchesIndexRouteImport } from './routes/_app/matches/index'
+import { Route as AppLogsIndexRouteImport } from './routes/_app/logs/index'
+import { Route as AppLeadsIndexRouteImport } from './routes/_app/leads/index'
+import { Route as AppHandoffsIndexRouteImport } from './routes/_app/handoffs/index'
+import { Route as AppContactsIndexRouteImport } from './routes/_app/contacts/index'
+import { Route as AppCatalogIndexRouteImport } from './routes/_app/catalog/index'
+import { Route as AppApprovalsIndexRouteImport } from './routes/_app/approvals/index'
+import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
+import { Route as AppActivitiesIndexRouteImport } from './routes/_app/activities/index'
+import { Route as AppAccountsIndexRouteImport } from './routes/_app/accounts/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -27,27 +37,145 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMatchesIndexRoute = AppMatchesIndexRouteImport.update({
+  id: '/matches/',
+  path: '/matches/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLogsIndexRoute = AppLogsIndexRouteImport.update({
+  id: '/logs/',
+  path: '/logs/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeadsIndexRoute = AppLeadsIndexRouteImport.update({
+  id: '/leads/',
+  path: '/leads/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHandoffsIndexRoute = AppHandoffsIndexRouteImport.update({
+  id: '/handoffs/',
+  path: '/handoffs/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContactsIndexRoute = AppContactsIndexRouteImport.update({
+  id: '/contacts/',
+  path: '/contacts/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCatalogIndexRoute = AppCatalogIndexRouteImport.update({
+  id: '/catalog/',
+  path: '/catalog/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppApprovalsIndexRoute = AppApprovalsIndexRouteImport.update({
+  id: '/approvals/',
+  path: '/approvals/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppActivitiesIndexRoute = AppActivitiesIndexRouteImport.update({
+  id: '/activities/',
+  path: '/activities/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAccountsIndexRoute = AppAccountsIndexRouteImport.update({
+  id: '/accounts/',
+  path: '/accounts/',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/accounts/': typeof AppAccountsIndexRoute
+  '/activities/': typeof AppActivitiesIndexRoute
+  '/admin/': typeof AppAdminIndexRoute
+  '/approvals/': typeof AppApprovalsIndexRoute
+  '/catalog/': typeof AppCatalogIndexRoute
+  '/contacts/': typeof AppContactsIndexRoute
+  '/handoffs/': typeof AppHandoffsIndexRoute
+  '/leads/': typeof AppLeadsIndexRoute
+  '/logs/': typeof AppLogsIndexRoute
+  '/matches/': typeof AppMatchesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AppIndexRoute
+  '/accounts': typeof AppAccountsIndexRoute
+  '/activities': typeof AppActivitiesIndexRoute
+  '/admin': typeof AppAdminIndexRoute
+  '/approvals': typeof AppApprovalsIndexRoute
+  '/catalog': typeof AppCatalogIndexRoute
+  '/contacts': typeof AppContactsIndexRoute
+  '/handoffs': typeof AppHandoffsIndexRoute
+  '/leads': typeof AppLeadsIndexRoute
+  '/logs': typeof AppLogsIndexRoute
+  '/matches': typeof AppMatchesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/accounts/': typeof AppAccountsIndexRoute
+  '/_app/activities/': typeof AppActivitiesIndexRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
+  '/_app/approvals/': typeof AppApprovalsIndexRoute
+  '/_app/catalog/': typeof AppCatalogIndexRoute
+  '/_app/contacts/': typeof AppContactsIndexRoute
+  '/_app/handoffs/': typeof AppHandoffsIndexRoute
+  '/_app/leads/': typeof AppLeadsIndexRoute
+  '/_app/logs/': typeof AppLogsIndexRoute
+  '/_app/matches/': typeof AppMatchesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/accounts/'
+    | '/activities/'
+    | '/admin/'
+    | '/approvals/'
+    | '/catalog/'
+    | '/contacts/'
+    | '/handoffs/'
+    | '/leads/'
+    | '/logs/'
+    | '/matches/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/'
-  id: '__root__' | '/_app' | '/login' | '/_app/'
+  to:
+    | '/login'
+    | '/'
+    | '/accounts'
+    | '/activities'
+    | '/admin'
+    | '/approvals'
+    | '/catalog'
+    | '/contacts'
+    | '/handoffs'
+    | '/leads'
+    | '/logs'
+    | '/matches'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/login'
+    | '/_app/'
+    | '/_app/accounts/'
+    | '/_app/activities/'
+    | '/_app/admin/'
+    | '/_app/approvals/'
+    | '/_app/catalog/'
+    | '/_app/contacts/'
+    | '/_app/handoffs/'
+    | '/_app/leads/'
+    | '/_app/logs/'
+    | '/_app/matches/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,15 +206,105 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/matches/': {
+      id: '/_app/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof AppMatchesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/logs/': {
+      id: '/_app/logs/'
+      path: '/logs'
+      fullPath: '/logs/'
+      preLoaderRoute: typeof AppLogsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/leads/': {
+      id: '/_app/leads/'
+      path: '/leads'
+      fullPath: '/leads/'
+      preLoaderRoute: typeof AppLeadsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/handoffs/': {
+      id: '/_app/handoffs/'
+      path: '/handoffs'
+      fullPath: '/handoffs/'
+      preLoaderRoute: typeof AppHandoffsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contacts/': {
+      id: '/_app/contacts/'
+      path: '/contacts'
+      fullPath: '/contacts/'
+      preLoaderRoute: typeof AppContactsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/catalog/': {
+      id: '/_app/catalog/'
+      path: '/catalog'
+      fullPath: '/catalog/'
+      preLoaderRoute: typeof AppCatalogIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/approvals/': {
+      id: '/_app/approvals/'
+      path: '/approvals'
+      fullPath: '/approvals/'
+      preLoaderRoute: typeof AppApprovalsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/activities/': {
+      id: '/_app/activities/'
+      path: '/activities'
+      fullPath: '/activities/'
+      preLoaderRoute: typeof AppActivitiesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/accounts/': {
+      id: '/_app/accounts/'
+      path: '/accounts'
+      fullPath: '/accounts/'
+      preLoaderRoute: typeof AppAccountsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppAccountsIndexRoute: typeof AppAccountsIndexRoute
+  AppActivitiesIndexRoute: typeof AppActivitiesIndexRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
+  AppApprovalsIndexRoute: typeof AppApprovalsIndexRoute
+  AppCatalogIndexRoute: typeof AppCatalogIndexRoute
+  AppContactsIndexRoute: typeof AppContactsIndexRoute
+  AppHandoffsIndexRoute: typeof AppHandoffsIndexRoute
+  AppLeadsIndexRoute: typeof AppLeadsIndexRoute
+  AppLogsIndexRoute: typeof AppLogsIndexRoute
+  AppMatchesIndexRoute: typeof AppMatchesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppAccountsIndexRoute: AppAccountsIndexRoute,
+  AppActivitiesIndexRoute: AppActivitiesIndexRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
+  AppApprovalsIndexRoute: AppApprovalsIndexRoute,
+  AppCatalogIndexRoute: AppCatalogIndexRoute,
+  AppContactsIndexRoute: AppContactsIndexRoute,
+  AppHandoffsIndexRoute: AppHandoffsIndexRoute,
+  AppLeadsIndexRoute: AppLeadsIndexRoute,
+  AppLogsIndexRoute: AppLogsIndexRoute,
+  AppMatchesIndexRoute: AppMatchesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -98,12 +316,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
