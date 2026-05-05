@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -19,11 +20,15 @@ export const Route = createFileRoute("/_app/approvals/")({ component: ApprovalsL
 
 function ApprovalsList() {
   const qc = useQueryClient();
+  const sp = useSearch({ strict: false }) as any;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [pendingOnly, setPendingOnly] = useState(false);
   const [decisionRow, setDecisionRow] = useState<any | null>(null);
   const [decision, setDecision] = useState<"approve" | "reject">("approve");
   const [comments, setComments] = useState("");
+
+  useEffect(() => { if (sp?.status === "pending") setPendingOnly(true); }, [sp?.status]);
 
   const { data: statuses = [] } = useLookup("approval_statuses");
 
