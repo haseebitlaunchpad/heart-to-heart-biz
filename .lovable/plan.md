@@ -1,69 +1,27 @@
-## Mobile responsiveness audit
+# Add Breadcrumbs Across the Portal
 
-The portal was built desktop-first. The core shell (fixed 240px sidebar) and every data table render off-screen on phones. Below are the concrete issues and fixes.
+A single `Breadcrumbs` component derives its trail from the current URL and is rendered inside the two header surfaces every page already uses. No per-page changes required.
 
-### Issues found
+## New file
 
-1. **AppShell** — Sidebar is always visible at `w-60`; on a 375px screen the main content is squeezed. No mobile menu.
-2. **PageHeader** — `flex justify-between` with `px-6 py-4` causes title + action buttons to overlap on narrow widths.
-3. **CrudListPage / DataTable** — Tables have many columns; `overflow-auto` works but rows are unreadable on mobile. Filter input and "New" button placement is fine but unverified on small widths.
-4. **DetailLayout** — Uses `lg:grid-cols-[280px_1fr]`, so on mobile the summary sidebar stacks above tabs (acceptable), but the header row uses `px-6` and action buttons can wrap awkwardly. Tabs already scroll horizontally — good.
-5. **Dashboard** — KPI grid `grid-cols-2 md:grid-cols-4 lg:grid-cols-7` causes the "All records" row to be cramped at 7 cols on tablet. Charts use fixed heights (acceptable). Mostly OK.
-6. **KanbanBoard** — Horizontal scroll already works on mobile (good), but column width 260px is fine.
-7. **GlobalSearch / header** — Header is just the search; fine, but needs a hamburger trigger for the new mobile sidebar.
-8. **Dialogs (Create record, RecordEditor)** — shadcn Dialog defaults are usually OK but should be checked for max-height / scroll on small screens.
-9. **Login page** — Likely already centered card; will verify.
+**`src/components/Breadcrumbs.tsx`** — uses `useLocation`, splits pathname into segments, maps each to a friendly label via a `LABELS` table (Leads, Accounts, Contacts, Opportunity Catalog, Matches, Approvals, Handoffs, Activities, Admin & Setup, Logs, Users, Roles, Workbench). UUID/numeric ID segments fall back to the `overrideLast` value passed by the page. Renders Home icon → crumbs separated by `ChevronRight`. Last crumb is plain text (current page); earlier crumbs are `<Link>`. Hidden on `/` (Dashboard). Mobile-safe: `overflow-x-auto`, `whitespace-nowrap`, last crumb truncates with `max-w-[60vw]`.
 
-### Fixes
+## Edits
 
-**1. AppShell → responsive drawer sidebar**
-- Sidebar becomes a slide-out `Sheet` on `<lg` (hidden by default), classic fixed sidebar on `lg+`.
-- Header on mobile shows: hamburger button (opens sheet), "Senaei CRM" wordmark, GlobalSearch shrunk.
-- Use shadcn `Sheet` (already in `components/ui`).
+**`src/components/PageHeader.tsx`** — render `<Breadcrumbs />` above the title row. Auto-applies to: Leads, Accounts, Contacts, Catalog, Matches, Approvals, Handoffs, Activities, Admin index, Admin sub-tables, Logs, Matches Workbench.
 
-**2. PageHeader**
-- Stack vertically on mobile: `flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`.
-- Reduce padding on mobile: `px-4 sm:px-6`.
-- Actions wrap with `flex-wrap`.
+**`src/components/DetailLayout.tsx`** — add optional `breadcrumbLabel?: string` prop, render `<Breadcrumbs overrideLast={breadcrumbLabel ?? title} />` above the title row. Since every detail page already passes a human-readable `title` (e.g. lead name, account name, "Handoff REC-123"), the last crumb auto-shows the record name with no per-page wiring needed. Auto-applies to: Lead, Account, Contact, Catalog, Match, Handoff, Activity detail pages.
 
-**3. CrudListPage**
-- Reduce padding `p-4` → `p-3 sm:p-4`.
-- Filter input full-width on mobile (`max-w-sm` only on `sm+`).
+## Result
 
-**4. DataTable**
-- Wrap table in `overflow-x-auto -mx-3 sm:mx-0` so it can scroll edge-to-edge.
-- Add `whitespace-nowrap` to header cells so columns size naturally instead of cramping.
-- Group-by dropdown row stacks on mobile.
+```
+Leads list:        Home › Leads
+Lead detail:       Home › Leads › Acme Corp
+Admin → Users:     Home › Admin & Setup › Users
+Admin → table:     Home › Admin & Setup › Industry Segments
+Matches Workbench: Home › Matches › Workbench
+Logs:              Home › Logs
+Dashboard (/):     (hidden — root page)
+```
 
-**5. DetailLayout**
-- Header `px-4 sm:px-6`, title row already wraps OK; ensure actions don't push title off-screen by adding `flex-wrap`.
-- Summary sidebar: on mobile becomes a collapsible section above tabs (default collapsed) so users land directly on tab content.
-
-**6. Dashboard**
-- "All records" KPIs: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7`.
-- Container padding `p-4 sm:p-6`.
-
-**7. RecordEditor / Dialogs**
-- Ensure DialogContent uses `max-h-[90vh] overflow-y-auto` and `w-[95vw] sm:max-w-lg` so large forms scroll on phones.
-
-**8. KanbanBoard** — no change (already scrolls).
-
-**9. Login page** — verify card width works at 320px; add `px-4` to outer container if missing.
-
-### Files to modify
-- `src/components/AppShell.tsx` — drawer sidebar + mobile header
-- `src/components/PageHeader.tsx` — responsive flex/padding
-- `src/components/CrudListPage.tsx` — padding + filter width
-- `src/components/DataTable.tsx` — horizontal scroll polish, header nowrap
-- `src/components/DetailLayout.tsx` — responsive padding, collapsible summary on mobile
-- `src/components/RecordEditor.tsx` — dialog sizing (read first)
-- `src/routes/_app/index.tsx` — KPI grid breakpoints, padding
-- `src/routes/login.tsx` — verify/adjust container padding (read first)
-
-### Known limitations to flag
-- **DataTable**: With 6+ columns, even with horizontal scroll the experience on a 375px phone is "swipe to read." A true card-per-row mobile view is a larger redesign — not included here. Tell user if they want full card mode I can do it as a follow-up per page.
-- **Kanban**: Drag-and-drop with horizontal column scroll on touch can be finicky in some browsers (dnd-kit limitation). Works but not as smooth as native apps.
-- **Recharts**: Charts use `ResponsiveContainer` and shrink fine, but legends/labels can get cramped under 360px.
-
-### QA
-After implementation I'll spot-check at 375×812 (iPhone) via the browser tool: dashboard, leads list, a lead detail, approvals, and the create-lead dialog.
+No detail-page edits, no schema changes, fully responsive.
