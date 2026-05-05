@@ -24,12 +24,24 @@ export const Route = createFileRoute("/_app/leads/")({ component: LeadsList });
 function LeadsList() {
   const qc = useQueryClient();
   const nav = useNavigate();
+  const sp = useSearch({ strict: false }) as any;
+  const { user } = useAuth();
   const [view, setView] = useState<"list" | "board">("list");
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("");
   const [tempFilter, setTempFilter] = useState("");
+  const [ownerMe, setOwnerMe] = useState(false);
+  const [openOnly, setOpenOnly] = useState(false);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({ lead_name: "", company_name: "", email: "", mobile: "", interest_notes: "" });
+
+  useEffect(() => {
+    if (sp?.owner === "me") setOwnerMe(true);
+    if (sp?.open === "1" || sp?.open === 1) setOpenOnly(true);
+    if (sp?.stage) setStageFilter(String(sp.stage));
+    if (sp?.temperature) setTempFilter(String(sp.temperature));
+  }, [sp?.owner, sp?.open, sp?.stage, sp?.temperature]);
+
 
   const { data: stages = [] } = useLookup("lead_stages", { orderBy: "sort_order" });
   const { data: temps = [] } = useLookup("lead_temperatures", { orderBy: "sort_order" });
