@@ -77,7 +77,7 @@ export function CrudListPage<T extends { id: string }>({
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 mr-1" /> New</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>Create {title.replace(/s$/, "")}</DialogTitle></DialogHeader>
               <div className="space-y-3">
                 {fields.map((f) => (
@@ -101,12 +101,12 @@ export function CrudListPage<T extends { id: string }>({
           </Dialog>
         }
       />
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <Input
           placeholder="Filter…"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="mb-3 max-w-sm"
+          className="mb-3 w-full sm:max-w-sm"
         />
         <div className="bg-card border rounded-lg">
           {isLoading ? <div className="p-8 text-center text-muted-foreground">Loading…</div>

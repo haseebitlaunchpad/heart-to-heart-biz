@@ -113,7 +113,7 @@ function Dashboard() {
   return (
     <>
       <PageHeader title="CRM Dashboard" subtitle={`${greet}, ${name} · ${new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}`} />
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-6">
         <div>
           <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">My work</div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -126,7 +126,7 @@ function Dashboard() {
 
         <div>
           <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">All records</div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
             <KpiTile to="/leads" label="Leads" value={leads.data ?? "…"} />
             <KpiTile to="/accounts" label="Accounts" value={accounts.data ?? "…"} />
             <KpiTile to="/contacts" label="Contacts" value={contacts.data ?? "…"} />
