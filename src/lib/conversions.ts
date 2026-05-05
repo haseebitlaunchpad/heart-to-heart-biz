@@ -9,7 +9,7 @@ async function uid() {
 }
 
 async function findLookupId(table: string, code: string) {
-  const { data } = await sb.from(table).select("id,code,name").or(`code.eq.${code},name.ilike.${code}`).maybeSingle();
+  const { data } = await sb.from(table).select("id").eq("code", code).maybeSingle();
   return data?.id ?? null;
 }
 
