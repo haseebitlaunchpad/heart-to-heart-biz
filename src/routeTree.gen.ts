@@ -22,6 +22,13 @@ import { Route as AppApprovalsIndexRouteImport } from './routes/_app/approvals/i
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppActivitiesIndexRouteImport } from './routes/_app/activities/index'
 import { Route as AppAccountsIndexRouteImport } from './routes/_app/accounts/index'
+import { Route as AppMatchesWorkbenchRouteImport } from './routes/_app/matches/workbench'
+import { Route as AppMatchesIdRouteImport } from './routes/_app/matches/$id'
+import { Route as AppLeadsIdRouteImport } from './routes/_app/leads/$id'
+import { Route as AppHandoffsIdRouteImport } from './routes/_app/handoffs/$id'
+import { Route as AppContactsIdRouteImport } from './routes/_app/contacts/$id'
+import { Route as AppCatalogIdRouteImport } from './routes/_app/catalog/$id'
+import { Route as AppAccountsIdRouteImport } from './routes/_app/accounts/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -87,10 +94,52 @@ const AppAccountsIndexRoute = AppAccountsIndexRouteImport.update({
   path: '/accounts/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMatchesWorkbenchRoute = AppMatchesWorkbenchRouteImport.update({
+  id: '/matches/workbench',
+  path: '/matches/workbench',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMatchesIdRoute = AppMatchesIdRouteImport.update({
+  id: '/matches/$id',
+  path: '/matches/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeadsIdRoute = AppLeadsIdRouteImport.update({
+  id: '/leads/$id',
+  path: '/leads/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHandoffsIdRoute = AppHandoffsIdRouteImport.update({
+  id: '/handoffs/$id',
+  path: '/handoffs/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContactsIdRoute = AppContactsIdRouteImport.update({
+  id: '/contacts/$id',
+  path: '/contacts/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCatalogIdRoute = AppCatalogIdRouteImport.update({
+  id: '/catalog/$id',
+  path: '/catalog/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAccountsIdRoute = AppAccountsIdRouteImport.update({
+  id: '/accounts/$id',
+  path: '/accounts/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/accounts/$id': typeof AppAccountsIdRoute
+  '/catalog/$id': typeof AppCatalogIdRoute
+  '/contacts/$id': typeof AppContactsIdRoute
+  '/handoffs/$id': typeof AppHandoffsIdRoute
+  '/leads/$id': typeof AppLeadsIdRoute
+  '/matches/$id': typeof AppMatchesIdRoute
+  '/matches/workbench': typeof AppMatchesWorkbenchRoute
   '/accounts/': typeof AppAccountsIndexRoute
   '/activities/': typeof AppActivitiesIndexRoute
   '/admin/': typeof AppAdminIndexRoute
@@ -105,6 +154,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AppIndexRoute
+  '/accounts/$id': typeof AppAccountsIdRoute
+  '/catalog/$id': typeof AppCatalogIdRoute
+  '/contacts/$id': typeof AppContactsIdRoute
+  '/handoffs/$id': typeof AppHandoffsIdRoute
+  '/leads/$id': typeof AppLeadsIdRoute
+  '/matches/$id': typeof AppMatchesIdRoute
+  '/matches/workbench': typeof AppMatchesWorkbenchRoute
   '/accounts': typeof AppAccountsIndexRoute
   '/activities': typeof AppActivitiesIndexRoute
   '/admin': typeof AppAdminIndexRoute
@@ -121,6 +177,13 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/accounts/$id': typeof AppAccountsIdRoute
+  '/_app/catalog/$id': typeof AppCatalogIdRoute
+  '/_app/contacts/$id': typeof AppContactsIdRoute
+  '/_app/handoffs/$id': typeof AppHandoffsIdRoute
+  '/_app/leads/$id': typeof AppLeadsIdRoute
+  '/_app/matches/$id': typeof AppMatchesIdRoute
+  '/_app/matches/workbench': typeof AppMatchesWorkbenchRoute
   '/_app/accounts/': typeof AppAccountsIndexRoute
   '/_app/activities/': typeof AppActivitiesIndexRoute
   '/_app/admin/': typeof AppAdminIndexRoute
@@ -137,6 +200,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/accounts/$id'
+    | '/catalog/$id'
+    | '/contacts/$id'
+    | '/handoffs/$id'
+    | '/leads/$id'
+    | '/matches/$id'
+    | '/matches/workbench'
     | '/accounts/'
     | '/activities/'
     | '/admin/'
@@ -151,6 +221,13 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/'
+    | '/accounts/$id'
+    | '/catalog/$id'
+    | '/contacts/$id'
+    | '/handoffs/$id'
+    | '/leads/$id'
+    | '/matches/$id'
+    | '/matches/workbench'
     | '/accounts'
     | '/activities'
     | '/admin'
@@ -166,6 +243,13 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/'
+    | '/_app/accounts/$id'
+    | '/_app/catalog/$id'
+    | '/_app/contacts/$id'
+    | '/_app/handoffs/$id'
+    | '/_app/leads/$id'
+    | '/_app/matches/$id'
+    | '/_app/matches/workbench'
     | '/_app/accounts/'
     | '/_app/activities/'
     | '/_app/admin/'
@@ -276,11 +360,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/matches/workbench': {
+      id: '/_app/matches/workbench'
+      path: '/matches/workbench'
+      fullPath: '/matches/workbench'
+      preLoaderRoute: typeof AppMatchesWorkbenchRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/matches/$id': {
+      id: '/_app/matches/$id'
+      path: '/matches/$id'
+      fullPath: '/matches/$id'
+      preLoaderRoute: typeof AppMatchesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/leads/$id': {
+      id: '/_app/leads/$id'
+      path: '/leads/$id'
+      fullPath: '/leads/$id'
+      preLoaderRoute: typeof AppLeadsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/handoffs/$id': {
+      id: '/_app/handoffs/$id'
+      path: '/handoffs/$id'
+      fullPath: '/handoffs/$id'
+      preLoaderRoute: typeof AppHandoffsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contacts/$id': {
+      id: '/_app/contacts/$id'
+      path: '/contacts/$id'
+      fullPath: '/contacts/$id'
+      preLoaderRoute: typeof AppContactsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/catalog/$id': {
+      id: '/_app/catalog/$id'
+      path: '/catalog/$id'
+      fullPath: '/catalog/$id'
+      preLoaderRoute: typeof AppCatalogIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/accounts/$id': {
+      id: '/_app/accounts/$id'
+      path: '/accounts/$id'
+      fullPath: '/accounts/$id'
+      preLoaderRoute: typeof AppAccountsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppAccountsIdRoute: typeof AppAccountsIdRoute
+  AppCatalogIdRoute: typeof AppCatalogIdRoute
+  AppContactsIdRoute: typeof AppContactsIdRoute
+  AppHandoffsIdRoute: typeof AppHandoffsIdRoute
+  AppLeadsIdRoute: typeof AppLeadsIdRoute
+  AppMatchesIdRoute: typeof AppMatchesIdRoute
+  AppMatchesWorkbenchRoute: typeof AppMatchesWorkbenchRoute
   AppAccountsIndexRoute: typeof AppAccountsIndexRoute
   AppActivitiesIndexRoute: typeof AppActivitiesIndexRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
@@ -295,6 +435,13 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppAccountsIdRoute: AppAccountsIdRoute,
+  AppCatalogIdRoute: AppCatalogIdRoute,
+  AppContactsIdRoute: AppContactsIdRoute,
+  AppHandoffsIdRoute: AppHandoffsIdRoute,
+  AppLeadsIdRoute: AppLeadsIdRoute,
+  AppMatchesIdRoute: AppMatchesIdRoute,
+  AppMatchesWorkbenchRoute: AppMatchesWorkbenchRoute,
   AppAccountsIndexRoute: AppAccountsIndexRoute,
   AppActivitiesIndexRoute: AppActivitiesIndexRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
