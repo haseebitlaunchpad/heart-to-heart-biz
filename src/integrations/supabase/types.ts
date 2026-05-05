@@ -56,6 +56,382 @@ export type Database = {
         }
         Relationships: []
       }
+      accounts: {
+        Row: {
+          account_category_id: string | null
+          account_name: string
+          account_status_id: string | null
+          city_id: string | null
+          company_name: string | null
+          country_id: string | null
+          cr_number: string | null
+          created_at: string
+          created_by: string | null
+          estimated_investment_budget: number | null
+          financial_notes: string | null
+          funding_source_id: string | null
+          funding_status_id: string | null
+          id: string
+          investment_size_band_id: string | null
+          investment_timeline_id: string | null
+          investor_type_id: string | null
+          is_archived: boolean
+          nationality_id: string | null
+          original_channel_id: string | null
+          owner_id: string | null
+          owner_team_id: string | null
+          preferred_financing_support: string | null
+          preferred_language: string | null
+          preferred_region_id: string | null
+          primary_email: string | null
+          primary_mobile: string | null
+          record_number: string | null
+          sector_id: string | null
+          source_lead_id: string | null
+          sub_sector_id: string | null
+          territory_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_category_id?: string | null
+          account_name: string
+          account_status_id?: string | null
+          city_id?: string | null
+          company_name?: string | null
+          country_id?: string | null
+          cr_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          estimated_investment_budget?: number | null
+          financial_notes?: string | null
+          funding_source_id?: string | null
+          funding_status_id?: string | null
+          id?: string
+          investment_size_band_id?: string | null
+          investment_timeline_id?: string | null
+          investor_type_id?: string | null
+          is_archived?: boolean
+          nationality_id?: string | null
+          original_channel_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          preferred_financing_support?: string | null
+          preferred_language?: string | null
+          preferred_region_id?: string | null
+          primary_email?: string | null
+          primary_mobile?: string | null
+          record_number?: string | null
+          sector_id?: string | null
+          source_lead_id?: string | null
+          sub_sector_id?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_category_id?: string | null
+          account_name?: string
+          account_status_id?: string | null
+          city_id?: string | null
+          company_name?: string | null
+          country_id?: string | null
+          cr_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          estimated_investment_budget?: number | null
+          financial_notes?: string | null
+          funding_source_id?: string | null
+          funding_status_id?: string | null
+          id?: string
+          investment_size_band_id?: string | null
+          investment_timeline_id?: string | null
+          investor_type_id?: string | null
+          is_archived?: boolean
+          nationality_id?: string | null
+          original_channel_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          preferred_financing_support?: string | null
+          preferred_language?: string | null
+          preferred_region_id?: string | null
+          primary_email?: string | null
+          primary_mobile?: string | null
+          record_number?: string | null
+          sector_id?: string | null
+          source_lead_id?: string | null
+          sub_sector_id?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_account_category_id_fkey"
+            columns: ["account_category_id"]
+            isOneToOne: false
+            referencedRelation: "account_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_account_status_id_fkey"
+            columns: ["account_status_id"]
+            isOneToOne: false
+            referencedRelation: "account_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_funding_source_id_fkey"
+            columns: ["funding_source_id"]
+            isOneToOne: false
+            referencedRelation: "funding_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_funding_status_id_fkey"
+            columns: ["funding_status_id"]
+            isOneToOne: false
+            referencedRelation: "funding_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_investment_size_band_id_fkey"
+            columns: ["investment_size_band_id"]
+            isOneToOne: false
+            referencedRelation: "investment_size_bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_investment_timeline_id_fkey"
+            columns: ["investment_timeline_id"]
+            isOneToOne: false
+            referencedRelation: "investment_timelines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_investor_type_id_fkey"
+            columns: ["investor_type_id"]
+            isOneToOne: false
+            referencedRelation: "investor_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_nationality_id_fkey"
+            columns: ["nationality_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_original_channel_id_fkey"
+            columns: ["original_channel_id"]
+            isOneToOne: false
+            referencedRelation: "lead_source_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_owner_team_id_fkey"
+            columns: ["owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_preferred_region_id_fkey"
+            columns: ["preferred_region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_source_lead_fk"
+            columns: ["source_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_sub_sector_id_fkey"
+            columns: ["sub_sector_id"]
+            isOneToOne: false
+            referencedRelation: "sub_sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_territory_id_fkey"
+            columns: ["territory_id"]
+            isOneToOne: false
+            referencedRelation: "territories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activities: {
+        Row: {
+          account_id: string | null
+          activity_type_id: string | null
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          handoff_id: string | null
+          id: string
+          is_archived: boolean
+          lead_id: string | null
+          next_follow_up_date: string | null
+          opportunity_match_id: string | null
+          outcome_id: string | null
+          owner_id: string | null
+          owner_team_id: string | null
+          record_number: string | null
+          related_object_id: string | null
+          related_object_type: string | null
+          status_id: string | null
+          subject: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          activity_type_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          handoff_id?: string | null
+          id?: string
+          is_archived?: boolean
+          lead_id?: string | null
+          next_follow_up_date?: string | null
+          opportunity_match_id?: string | null
+          outcome_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          record_number?: string | null
+          related_object_id?: string | null
+          related_object_type?: string | null
+          status_id?: string | null
+          subject: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          activity_type_id?: string | null
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          handoff_id?: string | null
+          id?: string
+          is_archived?: boolean
+          lead_id?: string | null
+          next_follow_up_date?: string | null
+          opportunity_match_id?: string | null
+          outcome_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          record_number?: string | null
+          related_object_id?: string | null
+          related_object_type?: string | null
+          status_id?: string | null
+          subject?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_activity_type_id_fkey"
+            columns: ["activity_type_id"]
+            isOneToOne: false
+            referencedRelation: "activity_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_handoff_fk"
+            columns: ["handoff_id"]
+            isOneToOne: false
+            referencedRelation: "handoffs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_opportunity_match_id_fkey"
+            columns: ["opportunity_match_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_outcome_id_fkey"
+            columns: ["outcome_id"]
+            isOneToOne: false
+            referencedRelation: "activity_outcomes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_owner_team_id_fkey"
+            columns: ["owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "activity_statuses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_outcomes: {
         Row: {
           code: string
@@ -148,6 +524,88 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      approvals: {
+        Row: {
+          approval_status_id: string | null
+          assigned_to: string | null
+          comments: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          handoff_id: string | null
+          id: string
+          opportunity_match_id: string | null
+          record_number: string | null
+          rejection_reason: string | null
+          related_object_id: string
+          related_object_type: string
+          requested_at: string | null
+          requested_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          approval_status_id?: string | null
+          assigned_to?: string | null
+          comments?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          handoff_id?: string | null
+          id?: string
+          opportunity_match_id?: string | null
+          record_number?: string | null
+          rejection_reason?: string | null
+          related_object_id: string
+          related_object_type: string
+          requested_at?: string | null
+          requested_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approval_status_id?: string | null
+          assigned_to?: string | null
+          comments?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          handoff_id?: string | null
+          id?: string
+          opportunity_match_id?: string | null
+          record_number?: string | null
+          rejection_reason?: string | null
+          related_object_id?: string
+          related_object_type?: string
+          requested_at?: string | null
+          requested_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approvals_approval_status_id_fkey"
+            columns: ["approval_status_id"]
+            isOneToOne: false
+            referencedRelation: "approval_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approvals_handoff_fk"
+            columns: ["handoff_id"]
+            isOneToOne: false
+            referencedRelation: "handoffs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approvals_opportunity_match_id_fkey"
+            columns: ["opportunity_match_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       assignment_rules: {
         Row: {
@@ -348,6 +806,134 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          account_id: string | null
+          consent_given: boolean | null
+          consent_notes: string | null
+          contact_role_id: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_archived: boolean
+          is_primary_contact: boolean
+          job_title: string | null
+          lead_id: string | null
+          mobile: string | null
+          nationality_id: string | null
+          owner_id: string | null
+          owner_team_id: string | null
+          preferred_channel_id: string | null
+          preferred_language: string | null
+          record_number: string | null
+          territory_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          consent_given?: boolean | null
+          consent_notes?: string | null
+          contact_role_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_archived?: boolean
+          is_primary_contact?: boolean
+          job_title?: string | null
+          lead_id?: string | null
+          mobile?: string | null
+          nationality_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          preferred_channel_id?: string | null
+          preferred_language?: string | null
+          record_number?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          consent_given?: boolean | null
+          consent_notes?: string | null
+          contact_role_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_archived?: boolean
+          is_primary_contact?: boolean
+          job_title?: string | null
+          lead_id?: string | null
+          mobile?: string | null
+          nationality_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          preferred_channel_id?: string | null
+          preferred_language?: string | null
+          record_number?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_contact_role_id_fkey"
+            columns: ["contact_role_id"]
+            isOneToOne: false
+            referencedRelation: "contact_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_nationality_id_fkey"
+            columns: ["nationality_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_owner_team_id_fkey"
+            columns: ["owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_preferred_channel_id_fkey"
+            columns: ["preferred_channel_id"]
+            isOneToOne: false
+            referencedRelation: "communication_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_territory_id_fkey"
+            columns: ["territory_id"]
+            isOneToOne: false
+            referencedRelation: "territories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       countries: {
         Row: {
           code: string
@@ -405,6 +991,45 @@ export type Database = {
           name?: string
           symbol?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          description: string | null
+          file_name: string
+          file_path: string | null
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          related_object_id: string
+          related_object_type: string
+          uploaded_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          description?: string | null
+          file_name: string
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          related_object_id: string
+          related_object_type: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          description?: string | null
+          file_name?: string
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          related_object_id?: string
+          related_object_type?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
         }
         Relationships: []
       }
@@ -545,6 +1170,144 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      handoffs: {
+        Row: {
+          accepted_at: string | null
+          account_id: string | null
+          catalog_opportunity_id: string | null
+          checklist_state: Json | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          failed_at: string | null
+          failure_reason: string | null
+          handoff_status_id: string | null
+          id: string
+          integration_status_id: string | null
+          is_archived: boolean
+          opportunity_match_id: string
+          owner_id: string | null
+          owner_team_id: string | null
+          package_payload: Json | null
+          record_number: string | null
+          retry_count: number
+          selected_path_id: string | null
+          submitted_at: string | null
+          submitted_by: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          account_id?: string | null
+          catalog_opportunity_id?: string | null
+          checklist_state?: Json | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          failed_at?: string | null
+          failure_reason?: string | null
+          handoff_status_id?: string | null
+          id?: string
+          integration_status_id?: string | null
+          is_archived?: boolean
+          opportunity_match_id: string
+          owner_id?: string | null
+          owner_team_id?: string | null
+          package_payload?: Json | null
+          record_number?: string | null
+          retry_count?: number
+          selected_path_id?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          account_id?: string | null
+          catalog_opportunity_id?: string | null
+          checklist_state?: Json | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          failed_at?: string | null
+          failure_reason?: string | null
+          handoff_status_id?: string | null
+          id?: string
+          integration_status_id?: string | null
+          is_archived?: boolean
+          opportunity_match_id?: string
+          owner_id?: string | null
+          owner_team_id?: string | null
+          package_payload?: Json | null
+          record_number?: string | null
+          retry_count?: number
+          selected_path_id?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handoffs_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_catalog_opportunity_id_fkey"
+            columns: ["catalog_opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_handoff_status_id_fkey"
+            columns: ["handoff_status_id"]
+            isOneToOne: false
+            referencedRelation: "handoff_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_integration_status_id_fkey"
+            columns: ["integration_status_id"]
+            isOneToOne: false
+            referencedRelation: "integration_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_opportunity_match_id_fkey"
+            columns: ["opportunity_match_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_owner_team_id_fkey"
+            columns: ["owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handoffs_selected_path_id_fkey"
+            columns: ["selected_path_id"]
+            isOneToOne: false
+            referencedRelation: "investment_paths"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       integration_logs: {
         Row: {
@@ -873,6 +1636,392 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          accepted_at: string | null
+          accepted_by_owner: boolean | null
+          ai_last_processed_at: string | null
+          ai_match_explanation: string | null
+          ai_score_reason: string | null
+          ai_source_summary: string | null
+          ai_suggested_next_action: string | null
+          archived_at: string | null
+          archived_by: string | null
+          assigned_at: string | null
+          assigned_by: string | null
+          best_time_to_contact: string | null
+          campaign_id: string | null
+          captured_by: string | null
+          city_id: string | null
+          company_name: string | null
+          contact_consent: boolean | null
+          conversion_status: string | null
+          converted_account_id: string | null
+          converted_at: string | null
+          converted_by: string | null
+          converted_contact_id: string | null
+          converted_match_id: string | null
+          country_of_residence_id: string | null
+          cr_number: string | null
+          cr_verified: boolean | null
+          created_at: string
+          created_by: string | null
+          data_completeness_percentage: number | null
+          days_in_stage: number | null
+          disqualification_reason_id: string | null
+          duplicate_status: string | null
+          email: string | null
+          event_id: string | null
+          handoff_readiness_status: string | null
+          id: string
+          interest_notes: string | null
+          investment_objective: string | null
+          investment_size_band_id: string | null
+          is_archived: boolean
+          last_activity_at: string | null
+          lead_name: string
+          lead_score: number | null
+          lead_stage_id: string | null
+          lead_status_id: string | null
+          lead_type: string | null
+          linked_account_id: string | null
+          linked_contact_id: string | null
+          mobile: string | null
+          national_id: string | null
+          nationality_id: string | null
+          next_follow_up_date: string | null
+          nurture_reason_id: string | null
+          owner_id: string | null
+          owner_team_id: string | null
+          preferred_city_id: string | null
+          preferred_contact_channel_id: string | null
+          preferred_language: string | null
+          preferred_region_id: string | null
+          priority: string | null
+          qualification_notes: string | null
+          qualification_temperature_id: string | null
+          qualified_at: string | null
+          received_at: string | null
+          record_number: string | null
+          sector_id: string | null
+          source_channel_id: string | null
+          source_reference_id: string | null
+          source_system: string | null
+          sub_sector_id: string | null
+          territory_id: string | null
+          updated_at: string
+          updated_by: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by_owner?: boolean | null
+          ai_last_processed_at?: string | null
+          ai_match_explanation?: string | null
+          ai_score_reason?: string | null
+          ai_source_summary?: string | null
+          ai_suggested_next_action?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          best_time_to_contact?: string | null
+          campaign_id?: string | null
+          captured_by?: string | null
+          city_id?: string | null
+          company_name?: string | null
+          contact_consent?: boolean | null
+          conversion_status?: string | null
+          converted_account_id?: string | null
+          converted_at?: string | null
+          converted_by?: string | null
+          converted_contact_id?: string | null
+          converted_match_id?: string | null
+          country_of_residence_id?: string | null
+          cr_number?: string | null
+          cr_verified?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          data_completeness_percentage?: number | null
+          days_in_stage?: number | null
+          disqualification_reason_id?: string | null
+          duplicate_status?: string | null
+          email?: string | null
+          event_id?: string | null
+          handoff_readiness_status?: string | null
+          id?: string
+          interest_notes?: string | null
+          investment_objective?: string | null
+          investment_size_band_id?: string | null
+          is_archived?: boolean
+          last_activity_at?: string | null
+          lead_name: string
+          lead_score?: number | null
+          lead_stage_id?: string | null
+          lead_status_id?: string | null
+          lead_type?: string | null
+          linked_account_id?: string | null
+          linked_contact_id?: string | null
+          mobile?: string | null
+          national_id?: string | null
+          nationality_id?: string | null
+          next_follow_up_date?: string | null
+          nurture_reason_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          preferred_city_id?: string | null
+          preferred_contact_channel_id?: string | null
+          preferred_language?: string | null
+          preferred_region_id?: string | null
+          priority?: string | null
+          qualification_notes?: string | null
+          qualification_temperature_id?: string | null
+          qualified_at?: string | null
+          received_at?: string | null
+          record_number?: string | null
+          sector_id?: string | null
+          source_channel_id?: string | null
+          source_reference_id?: string | null
+          source_system?: string | null
+          sub_sector_id?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by_owner?: boolean | null
+          ai_last_processed_at?: string | null
+          ai_match_explanation?: string | null
+          ai_score_reason?: string | null
+          ai_source_summary?: string | null
+          ai_suggested_next_action?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
+          assigned_at?: string | null
+          assigned_by?: string | null
+          best_time_to_contact?: string | null
+          campaign_id?: string | null
+          captured_by?: string | null
+          city_id?: string | null
+          company_name?: string | null
+          contact_consent?: boolean | null
+          conversion_status?: string | null
+          converted_account_id?: string | null
+          converted_at?: string | null
+          converted_by?: string | null
+          converted_contact_id?: string | null
+          converted_match_id?: string | null
+          country_of_residence_id?: string | null
+          cr_number?: string | null
+          cr_verified?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          data_completeness_percentage?: number | null
+          days_in_stage?: number | null
+          disqualification_reason_id?: string | null
+          duplicate_status?: string | null
+          email?: string | null
+          event_id?: string | null
+          handoff_readiness_status?: string | null
+          id?: string
+          interest_notes?: string | null
+          investment_objective?: string | null
+          investment_size_band_id?: string | null
+          is_archived?: boolean
+          last_activity_at?: string | null
+          lead_name?: string
+          lead_score?: number | null
+          lead_stage_id?: string | null
+          lead_status_id?: string | null
+          lead_type?: string | null
+          linked_account_id?: string | null
+          linked_contact_id?: string | null
+          mobile?: string | null
+          national_id?: string | null
+          nationality_id?: string | null
+          next_follow_up_date?: string | null
+          nurture_reason_id?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          preferred_city_id?: string | null
+          preferred_contact_channel_id?: string | null
+          preferred_language?: string | null
+          preferred_region_id?: string | null
+          priority?: string | null
+          qualification_notes?: string | null
+          qualification_temperature_id?: string | null
+          qualified_at?: string | null
+          received_at?: string | null
+          record_number?: string | null
+          sector_id?: string | null
+          source_channel_id?: string | null
+          source_reference_id?: string | null
+          source_system?: string | null
+          sub_sector_id?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_converted_account_fk"
+            columns: ["converted_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_converted_contact_fk"
+            columns: ["converted_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_converted_match_fk"
+            columns: ["converted_match_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_country_of_residence_id_fkey"
+            columns: ["country_of_residence_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_disqualification_reason_id_fkey"
+            columns: ["disqualification_reason_id"]
+            isOneToOne: false
+            referencedRelation: "lead_disqualification_reasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_investment_size_band_id_fkey"
+            columns: ["investment_size_band_id"]
+            isOneToOne: false
+            referencedRelation: "investment_size_bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_lead_stage_id_fkey"
+            columns: ["lead_stage_id"]
+            isOneToOne: false
+            referencedRelation: "lead_stages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_lead_status_id_fkey"
+            columns: ["lead_status_id"]
+            isOneToOne: false
+            referencedRelation: "lead_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_linked_account_fk"
+            columns: ["linked_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_linked_contact_fk"
+            columns: ["linked_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_nationality_id_fkey"
+            columns: ["nationality_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_nurture_reason_id_fkey"
+            columns: ["nurture_reason_id"]
+            isOneToOne: false
+            referencedRelation: "lead_nurture_reasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_owner_team_id_fkey"
+            columns: ["owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_preferred_city_id_fkey"
+            columns: ["preferred_city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_preferred_contact_channel_id_fkey"
+            columns: ["preferred_contact_channel_id"]
+            isOneToOne: false
+            referencedRelation: "communication_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_preferred_region_id_fkey"
+            columns: ["preferred_region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_qualification_temperature_id_fkey"
+            columns: ["qualification_temperature_id"]
+            isOneToOne: false
+            referencedRelation: "lead_temperatures"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_source_channel_id_fkey"
+            columns: ["source_channel_id"]
+            isOneToOne: false
+            referencedRelation: "lead_source_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_sub_sector_id_fkey"
+            columns: ["sub_sector_id"]
+            isOneToOne: false
+            referencedRelation: "sub_sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_territory_id_fkey"
+            columns: ["territory_id"]
+            isOneToOne: false
+            referencedRelation: "territories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lifecycle_phases: {
         Row: {
           code: string
@@ -945,6 +2094,263 @@ export type Database = {
         }
         Relationships: []
       }
+      opportunity_catalog: {
+        Row: {
+          area_size: number | null
+          available_from: string | null
+          available_paths: string[] | null
+          capacity: number | null
+          category_id: string | null
+          city_id: string | null
+          created_at: string
+          created_by: string | null
+          currency_id: string | null
+          default_path_id: string | null
+          description: string | null
+          eligible_channels: string[] | null
+          eligible_investment_bands: string[] | null
+          eligible_investor_type: string | null
+          eligible_nationality_type: string | null
+          eligible_sectors: string[] | null
+          exclusion_criteria: string | null
+          expected_benefit: string | null
+          expiry_date: string | null
+          id: string
+          internal_notes: string | null
+          investment_size_band_id: string | null
+          is_archived: boolean
+          journey_area: string | null
+          lifecycle_phase_id: string | null
+          max_investment: number | null
+          min_investment: number | null
+          mrl_max: number | null
+          mrl_min: number | null
+          opportunity_type_id: string | null
+          owner_id: string | null
+          path_a_description: string | null
+          path_b_description: string | null
+          path_c_description: string | null
+          path_owner_team_id: string | null
+          program_service_category: string | null
+          record_number: string | null
+          reference_url: string | null
+          region_id: string | null
+          required_cr: boolean | null
+          required_documents: string[] | null
+          sector_id: string | null
+          site_name: string | null
+          status_id: string | null
+          strategic_objective: string | null
+          sub_sector_id: string | null
+          title: string
+          trl_max: number | null
+          trl_min: number | null
+          updated_at: string
+          updated_by: string | null
+          visibility_id: string | null
+        }
+        Insert: {
+          area_size?: number | null
+          available_from?: string | null
+          available_paths?: string[] | null
+          capacity?: number | null
+          category_id?: string | null
+          city_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency_id?: string | null
+          default_path_id?: string | null
+          description?: string | null
+          eligible_channels?: string[] | null
+          eligible_investment_bands?: string[] | null
+          eligible_investor_type?: string | null
+          eligible_nationality_type?: string | null
+          eligible_sectors?: string[] | null
+          exclusion_criteria?: string | null
+          expected_benefit?: string | null
+          expiry_date?: string | null
+          id?: string
+          internal_notes?: string | null
+          investment_size_band_id?: string | null
+          is_archived?: boolean
+          journey_area?: string | null
+          lifecycle_phase_id?: string | null
+          max_investment?: number | null
+          min_investment?: number | null
+          mrl_max?: number | null
+          mrl_min?: number | null
+          opportunity_type_id?: string | null
+          owner_id?: string | null
+          path_a_description?: string | null
+          path_b_description?: string | null
+          path_c_description?: string | null
+          path_owner_team_id?: string | null
+          program_service_category?: string | null
+          record_number?: string | null
+          reference_url?: string | null
+          region_id?: string | null
+          required_cr?: boolean | null
+          required_documents?: string[] | null
+          sector_id?: string | null
+          site_name?: string | null
+          status_id?: string | null
+          strategic_objective?: string | null
+          sub_sector_id?: string | null
+          title: string
+          trl_max?: number | null
+          trl_min?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          visibility_id?: string | null
+        }
+        Update: {
+          area_size?: number | null
+          available_from?: string | null
+          available_paths?: string[] | null
+          capacity?: number | null
+          category_id?: string | null
+          city_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency_id?: string | null
+          default_path_id?: string | null
+          description?: string | null
+          eligible_channels?: string[] | null
+          eligible_investment_bands?: string[] | null
+          eligible_investor_type?: string | null
+          eligible_nationality_type?: string | null
+          eligible_sectors?: string[] | null
+          exclusion_criteria?: string | null
+          expected_benefit?: string | null
+          expiry_date?: string | null
+          id?: string
+          internal_notes?: string | null
+          investment_size_band_id?: string | null
+          is_archived?: boolean
+          journey_area?: string | null
+          lifecycle_phase_id?: string | null
+          max_investment?: number | null
+          min_investment?: number | null
+          mrl_max?: number | null
+          mrl_min?: number | null
+          opportunity_type_id?: string | null
+          owner_id?: string | null
+          path_a_description?: string | null
+          path_b_description?: string | null
+          path_c_description?: string | null
+          path_owner_team_id?: string | null
+          program_service_category?: string | null
+          record_number?: string | null
+          reference_url?: string | null
+          region_id?: string | null
+          required_cr?: boolean | null
+          required_documents?: string[] | null
+          sector_id?: string | null
+          site_name?: string | null
+          status_id?: string | null
+          strategic_objective?: string | null
+          sub_sector_id?: string | null
+          title?: string
+          trl_max?: number | null
+          trl_min?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          visibility_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_catalog_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_currency_id_fkey"
+            columns: ["currency_id"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_default_path_id_fkey"
+            columns: ["default_path_id"]
+            isOneToOne: false
+            referencedRelation: "investment_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_investment_size_band_id_fkey"
+            columns: ["investment_size_band_id"]
+            isOneToOne: false
+            referencedRelation: "investment_size_bands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_lifecycle_phase_id_fkey"
+            columns: ["lifecycle_phase_id"]
+            isOneToOne: false
+            referencedRelation: "lifecycle_phases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_opportunity_type_id_fkey"
+            columns: ["opportunity_type_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_path_owner_team_id_fkey"
+            columns: ["path_owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_sector_id_fkey"
+            columns: ["sector_id"]
+            isOneToOne: false
+            referencedRelation: "sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_status_id_fkey"
+            columns: ["status_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_sub_sector_id_fkey"
+            columns: ["sub_sector_id"]
+            isOneToOne: false
+            referencedRelation: "sub_sectors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_catalog_visibility_id_fkey"
+            columns: ["visibility_id"]
+            isOneToOne: false
+            referencedRelation: "visibility_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunity_categories: {
         Row: {
           code: string
@@ -965,6 +2371,186 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      opportunity_matches: {
+        Row: {
+          account_id: string | null
+          approval_status_id: string | null
+          approved_at: string | null
+          approved_by: string | null
+          catalog_opportunity_id: string
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          eligibility_result: string | null
+          handoff_status_id: string | null
+          id: string
+          is_archived: boolean
+          lead_id: string | null
+          manual_override_flag: boolean | null
+          match_status_id: string | null
+          match_type_id: string | null
+          missing_requirements: string[] | null
+          notes: string | null
+          owner_id: string | null
+          owner_team_id: string | null
+          path_notes: string | null
+          record_number: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          selected_path_id: string | null
+          submitted_at: string | null
+          submitted_by: string | null
+          territory_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          approval_status_id?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          catalog_opportunity_id: string
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          eligibility_result?: string | null
+          handoff_status_id?: string | null
+          id?: string
+          is_archived?: boolean
+          lead_id?: string | null
+          manual_override_flag?: boolean | null
+          match_status_id?: string | null
+          match_type_id?: string | null
+          missing_requirements?: string[] | null
+          notes?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          path_notes?: string | null
+          record_number?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          selected_path_id?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          approval_status_id?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          catalog_opportunity_id?: string
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          eligibility_result?: string | null
+          handoff_status_id?: string | null
+          id?: string
+          is_archived?: boolean
+          lead_id?: string | null
+          manual_override_flag?: boolean | null
+          match_status_id?: string | null
+          match_type_id?: string | null
+          missing_requirements?: string[] | null
+          notes?: string | null
+          owner_id?: string | null
+          owner_team_id?: string | null
+          path_notes?: string | null
+          record_number?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          selected_path_id?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          territory_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_matches_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_approval_status_id_fkey"
+            columns: ["approval_status_id"]
+            isOneToOne: false
+            referencedRelation: "approval_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_catalog_opportunity_id_fkey"
+            columns: ["catalog_opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunity_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_handoff_status_id_fkey"
+            columns: ["handoff_status_id"]
+            isOneToOne: false
+            referencedRelation: "handoff_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_match_status_id_fkey"
+            columns: ["match_status_id"]
+            isOneToOne: false
+            referencedRelation: "match_statuses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_match_type_id_fkey"
+            columns: ["match_type_id"]
+            isOneToOne: false
+            referencedRelation: "match_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_owner_team_id_fkey"
+            columns: ["owner_team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_selected_path_id_fkey"
+            columns: ["selected_path_id"]
+            isOneToOne: false
+            referencedRelation: "investment_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_matches_territory_id_fkey"
+            columns: ["territory_id"]
+            isOneToOne: false
+            referencedRelation: "territories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       opportunity_statuses: {
         Row: {
