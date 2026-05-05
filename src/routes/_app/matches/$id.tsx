@@ -95,6 +95,12 @@ function MatchDetail() {
       actions={<>
         <Button size="sm" variant="outline" onClick={runEligibility}>Run Eligibility</Button>
         <Button size="sm" onClick={submit}>Submit for Approval</Button>
+        {aps?.code === "APPROVED" && (
+          <Button size="sm" variant="default" onClick={async () => {
+            try { const hid = await promoteMatchToHandoff(id); toast.success("Handoff created"); nav({ to: `/handoffs/${hid}` as any }); }
+            catch (e: any) { toast.error(e.message); }
+          }}><Send className="h-4 w-4 mr-1" />Send to Handoff</Button>
+        )}
       </>}
       summary={<>
         <SummaryField label="Catalog" value={<Link to={`/catalog/${m.catalog_opportunity_id}` as any} className="text-primary">{m.opportunity_catalog?.title}</Link>} />
