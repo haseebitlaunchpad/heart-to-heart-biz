@@ -3,8 +3,9 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, Building2, UserCircle, Package, Link2,
-  ClipboardCheck, Send, CalendarClock, Settings, FileText, LogOut, Search,
+  ClipboardCheck, Send, CalendarClock, Settings, FileText, LogOut,
 } from "lucide-react";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -65,12 +66,8 @@ export function AppShell() {
         </div>
       </aside>
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 border-b flex items-center px-4 gap-3">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <input
-            placeholder="Global search (demo)"
-            className="bg-transparent outline-none text-sm flex-1 placeholder:text-muted-foreground"
-          />
+        <header className="h-14 border-b flex items-center px-4 gap-3 bg-card">
+          <GlobalSearch />
         </header>
         <div className="flex-1 overflow-y-auto">
           <Outlet />
