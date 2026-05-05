@@ -2600,6 +2600,27 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          action: string
+          description: string | null
+          id: string
+          resource: string
+        }
+        Insert: {
+          action: string
+          description?: string | null
+          id?: string
+          resource: string
+        }
+        Update: {
+          action?: string
+          description?: string | null
+          id?: string
+          resource?: string
+        }
+        Relationships: []
+      }
       regions: {
         Row: {
           code: string
@@ -2637,6 +2658,29 @@ export type Database = {
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_permissions: {
+        Row: {
+          permission_id: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          permission_id: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          permission_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
         ]
@@ -3094,6 +3138,10 @@ export type Database = {
           _roles: Database["public"]["Enums"]["app_role"][]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_permission: {
+        Args: { _action: string; _resource: string; _user: string }
         Returns: boolean
       }
       has_role: {

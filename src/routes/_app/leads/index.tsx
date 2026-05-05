@@ -116,20 +116,25 @@ function LeadsList() {
               <DataTable
                 rows={filtered as any}
                 linkBase="/leads"
+                groupableKeys={["stage", "temp"]}
                 columns={[
                   { key: "record_number", header: "ID" },
                   { key: "lead_name", header: "Name" },
                   { key: "company_name", header: "Company" },
                   { key: "email", header: "Email" },
-                  { key: "mobile", header: "Mobile" },
-                  { key: "stage", header: "Stage", render: (r: any) => {
-                    const s = (stages as any[]).find((x) => x.id === r.lead_stage_id);
-                    return <StatusBadge label={s?.name} color={s?.color} />;
-                  } },
-                  { key: "temp", header: "Temp", render: (r: any) => {
-                    const s = (temps as any[]).find((x) => x.id === r.qualification_temperature_id);
-                    return <StatusBadge label={s?.name} color={s?.color} />;
-                  } },
+                  { key: "mobile", header: "Mobile", sortable: false },
+                  { key: "stage", header: "Stage",
+                    value: (r: any) => (stages as any[]).find((x) => x.id === r.lead_stage_id)?.name ?? "—",
+                    render: (r: any) => {
+                      const s = (stages as any[]).find((x) => x.id === r.lead_stage_id);
+                      return <StatusBadge label={s?.name} color={s?.color} />;
+                    } },
+                  { key: "temp", header: "Temp",
+                    value: (r: any) => (temps as any[]).find((x) => x.id === r.qualification_temperature_id)?.name ?? "—",
+                    render: (r: any) => {
+                      const s = (temps as any[]).find((x) => x.id === r.qualification_temperature_id);
+                      return <StatusBadge label={s?.name} color={s?.color} />;
+                    } },
                   { key: "lead_score", header: "Score" },
                 ]}
               />
@@ -140,6 +145,21 @@ function LeadsList() {
             columns={(stages as any[]).map((s) => ({ id: s.id, title: s.name, color: s.color }))}
             cards={(filtered as any[]).map((r) => ({ id: r.id, columnId: r.lead_stage_id ?? "", title: r.lead_name, subtitle: r.company_name ?? r.email, meta: r.record_number }))}
             linkBase="/leads"
+            onCardMove={async (cardId, fromColId, toColId) => {
+              qc.setQueryData(["leads"], (old: any) =>
+                Array.isArray(old) ? old.map((r: any) => (r.id === cardId ? { ...r, lead_stage_id: toColId } : r)) : old
+              );
+              const fromCode = (stages as any[]).find((s) => s.id === fromColId)?.code;
+              const toCode = (stages as any[]).find((s) => s.id === toColId)?.code;
+              const { error } = await (supabase as any).from("leads").update({ lead_stage_id: toColId }).eq("id", cardId);
+              if (error) {
+                toast.error(error.message);
+                qc.invalidateQueries({ queryKey: ["leads"] });
+                return;
+              }
+              await writeWorkflowLog({ process: "lead_stage_change", objectType: "leads", objectId: cardId, fromStatus: fromCode, toStatus: toCode, action: "drag_drop" });
+              toast.success(`Stage → ${toCode}`);
+            }}
           />
         )}
         <div className="text-xs text-muted-foreground mt-2">{filtered.length} record(s)</div>

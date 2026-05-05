@@ -18,7 +18,8 @@ import { schemas } from "@/lib/recordSchemas";
 import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertTriangle, Plus, Target, Send } from "lucide-react";
+import { CheckCircle2, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { createMatchFromLead, submitForApproval } from "@/lib/conversions";
 
 export const Route = createFileRoute("/_app/leads/$id")({ component: LeadDetail });
@@ -101,12 +102,20 @@ function LeadDetail() {
         }
         actions={
           <>
-            <Button size="sm" variant="outline" onClick={() => setActDrawer(true)}><Plus className="h-4 w-4 mr-1" />Log Activity</Button>
-            <Button size="sm" variant="outline" onClick={() => setIdentifyOpen(true)}><AlertTriangle className="h-4 w-4 mr-1" />Identify</Button>
-            <Button size="sm" variant="outline" onClick={() => setMatchOpen(true)}><Target className="h-4 w-4 mr-1" />Create Match</Button>
-            <Button size="sm" variant="outline" onClick={() => setSubmitOpen(true)}><Send className="h-4 w-4 mr-1" />Submit Approval</Button>
-            <Button size="sm" variant="outline" onClick={() => setDisqOpen(true)}>Disqualify</Button>
             <Button size="sm" onClick={() => setConvertOpen(true)}><CheckCircle2 className="h-4 w-4 mr-1" />Convert</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline"><MoreHorizontal className="h-4 w-4" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setActDrawer(true)}>Log Activity</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIdentifyOpen(true)}>Identify duplicates</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setMatchOpen(true)}>Create Match</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSubmitOpen(true)}>Submit Approval</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setDisqOpen(true)} className="text-destructive">Disqualify</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <DeleteRecordButton table="leads" recordId={id} recordNumber={lead.record_number} redirectTo="/leads" />
           </>
         }
@@ -252,9 +261,23 @@ function SubmitApprovalDialog({ open, onOpenChange, objectType, objectId }: { op
 
 
 function MatchesPanel({ leadId }: { leadId: string }) {
+  // Pull linked account so we also surface matches created post-conversion under the account
+  const { data: lead } = useQuery({
+    queryKey: ["lead-mini", leadId],
+    queryFn: async () => (await supabase.from("leads").select("linked_account_id, converted_account_id").eq("id", leadId).maybeSingle()).data,
+  });
+  const accountId = lead?.linked_account_id ?? lead?.converted_account_id ?? null;
   const { data = [] } = useQuery({
-    queryKey: ["lead-matches", leadId],
-    queryFn: async () => (await supabase.from("opportunity_matches").select("*, opportunity_catalog(title), match_statuses(name,color)").eq("lead_id", leadId)).data ?? [],
+    queryKey: ["lead-matches", leadId, accountId],
+    queryFn: async () => {
+      const filters = [`lead_id.eq.${leadId}`];
+      if (accountId) filters.push(`account_id.eq.${accountId}`);
+      const { data } = await supabase
+        .from("opportunity_matches")
+        .select("*, opportunity_catalog(title), match_statuses(name,color)")
+        .or(filters.join(","));
+      return data ?? [];
+    },
   });
   if (!data.length) return <div className="text-sm text-muted-foreground p-6 text-center">No matches.</div>;
   return (

@@ -106,12 +106,27 @@ export function RecordEditor({
     onError: (e: any) => toast.error(e.message),
   });
 
+  const dirty = useMemo(() => {
+    return Object.keys(form).some((k) => JSON.stringify(form[k] ?? null) !== JSON.stringify(initial[k] ?? null));
+  }, [form, initial]);
+
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-4 max-w-4xl pb-6">
+      {dirty && (
+        <div className="sticky top-0 z-10 -mx-1 px-3 py-2 bg-amber-50 border border-amber-300 rounded flex items-center justify-between">
+          <span className="text-xs text-amber-900">You have unsaved changes</span>
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" disabled={saving} onClick={() => setForm(initial)}>Discard</Button>
+            <Button size="sm" disabled={saving} onClick={async () => { setSaving(true); try { await save.mutateAsync(); } finally { setSaving(false); } }}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+          </div>
+        </div>
+      )}
       {sections.map((s) => (
         <div key={s.title} className="bg-card border rounded-lg p-4">
           <h3 className="text-sm font-semibold mb-3">{s.title}</h3>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-3">
             {s.fields.map((f) => (
               <div key={f.key} className={f.type === "textarea" ? "md:col-span-2" : ""}>
                 <Label className="text-xs">{f.label}</Label>
@@ -123,12 +138,6 @@ export function RecordEditor({
           </div>
         </div>
       ))}
-      <div className="sticky bottom-0 bg-background/80 backdrop-blur py-3 flex gap-2 border-t">
-        <Button disabled={saving} onClick={async () => { setSaving(true); try { await save.mutateAsync(); } finally { setSaving(false); } }}>
-          {saving ? "Saving…" : "Save changes"}
-        </Button>
-        <Button variant="ghost" disabled={saving} onClick={() => setForm(initial)}>Reset</Button>
-      </div>
     </div>
   );
 }

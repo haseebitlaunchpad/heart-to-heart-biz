@@ -20,9 +20,27 @@ const SETUP_TABLES = [
 function AdminPage() {
   return (
     <>
-      <PageHeader title="Admin & Setup" subtitle="Reference data and lookup tables" />
-      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {SETUP_TABLES.map((t) => <SetupCard key={t} table={t} />)}
+      <PageHeader title="Admin & Setup" subtitle="Users, roles, and reference data" />
+      <div className="p-6 space-y-6">
+        <div>
+          <h2 className="text-sm font-semibold mb-2">Access control</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <Link to="/admin/users" className="bg-card border rounded-lg p-4 hover:bg-accent/50 transition block">
+              <div className="text-sm font-medium">Users</div>
+              <div className="text-xs text-muted-foreground mt-1">Assign roles to users</div>
+            </Link>
+            <Link to="/admin/roles" className="bg-card border rounded-lg p-4 hover:bg-accent/50 transition block">
+              <div className="text-sm font-medium">Roles & Permissions</div>
+              <div className="text-xs text-muted-foreground mt-1">Toggle CRUD &amp; status permissions per role</div>
+            </Link>
+          </div>
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold mb-2">Reference data</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {SETUP_TABLES.map((t) => <SetupCard key={t} table={t} />)}
+          </div>
+        </div>
       </div>
     </>
   );
