@@ -1,111 +1,173 @@
-# Full CRUD + Editability Audit & Fix
 
-## Problem (from re-audit)
+# Major UX, RBAC, and Design System Overhaul
 
-- **Account detail** has only an action area in the header — no edit/save affordance and only 7 fields editable on the Overview form (the table has 30+).
-- **Lead detail** Overview edits 8 fields out of ~60. Status / Temperature / Priority badges are read-only.
-- **Contact detail** Overview edits only 4 fields; no role, account link, language, consent, nationality. "Set Primary" exists but there is no clear flow to **add multiple contacts** to an Account from the Contact page itself, and primary toggle does not demote the previous primary.
-- **Catalog detail** Overview edits 5 fields; eligibility, paths, dates, capacity, currency, archival are read-only. Also has a broken `useLookup` line (conditional hook).
-- **Match detail** has no editable Overview tab at all (path notes, eligibility justification, score, etc.).
-- **Handoff detail** has no editable Overview tab (only checklist).
-- **Activities** has no detail/edit page — only the drawer to create.
-- **Audit logging**: inserts/updates already trigger `audit_logs` via `audit_changes()`, but UI-driven changes do not always also write `workflow_logs` (only stage/state transitions do). User wants every meaningful change logged.
-- **Delete**: list rows have no delete affordance; admin RLS allows it.
+This plan addresses every issue in the message in one coherent pass. Schema additions are minimal — most work is UI/UX and frontend logic.
 
-## Solution
+---
 
-Introduce one shared, schema-driven editor and apply it to every detail page so coverage is complete, lookups render as selects, and every save writes both `audit_logs` (already automatic) and a `workflow_logs` "field_update" row.
+## 1. Design System Upgrade (Salesforce Lightning / SAP Fiori inspired)
 
-### 1. Shared `RecordEditor` component (`src/components/RecordEditor.tsx`)
+Refresh `src/styles.css` tokens and shared components so all screens feel cohesive and dense like Salesforce Lightning.
 
-Generic form renderer that takes a `fields` schema and a record:
+- **Color tokens**: introduce semantic SLDS-style palette — `--brand` (#0176D3 Salesforce blue), `--brand-dark`, `--surface`, `--surface-alt`, `--border-subtle`, `--text-primary/secondary/tertiary`, `--success/warning/error/info` with light tints for badges. Replace ad-hoc Tailwind colors in components.
+- **Typography scale**: `--font-h1: 1.125rem/600`, `--font-h2: 1rem/600`, `--font-body: 0.8125rem`, `--font-meta: 0.75rem` (matches SLDS density). Set base font to `Inter` with `-apple-system` fallback.
+- **Spacing**: 4px base, denser grids (`gap-2`/`gap-3`) instead of `gap-4` everywhere.
+- **Shared primitives** rebuilt with SLDS look:
+  - `PageHeader` — sticky, narrow (56 px), title left, breadcrumb above, actions right.
+  - `RecordHeader` (new, replaces inline header in each `$id.tsx`) — Salesforce "highlights panel": object icon + title + record number, key-field strip across the bottom (5 compact "highlight" tiles like Stage, Status, Owner, Score, Days), and a single primary CTA + overflow menu instead of 7 buttons.
+  - `Tabs`, `Card`, `Section`, `Badge`, `DataTable`, `Kanban` — shared paddings, borders, and hover states.
+- Replace the current `DetailLayout` with the new `RecordHeader` + tabbed body. The summary rail becomes a collapsible right pane (SLDS "details" panel) so the main canvas isn't cramped on a 931 px viewport.
+- **Save bar fix**: remove `sticky bottom-0` from `RecordEditor`; instead place a single sticky **top-right** "Save / Discard" toolbar inside the Overview tab that only appears when the form is dirty (Salesforce "unsaved changes" pattern). Body scrolls naturally.
 
-```text
-type FieldDef =
-  | { key, label, type: "text" | "textarea" | "number" | "date" | "datetime" | "checkbox" | "email" | "tel" }
-  | { key, label, type: "lookup", table, labelKey?, orderBy? }
-  | { key, label, type: "enum", options: {value,label}[] }
-  | { key, label, type: "readonly" }
+## 2. Lead Detail Cleanup
+
+- Replace the 7-button action bar with: **Convert** (primary), and an overflow `…` menu containing Log Activity / Identify / Create Match / Submit Approval / Disqualify / Delete.
+- Left summary rail: redesign as a vertical "highlights" stack with grouped sections (Contact, Source, Qualification, System) and compact label/value rows; always-visible scrollbar removed. Make `StagePath` horizontal across the top of the main canvas (Salesforce path component) instead of inside the rail.
+- Header `badges` chips use the new tone tokens.
+
+## 3. Drag-and-Drop Kanban (Lead Stage)
+
+Add `@dnd-kit/core` + `@dnd-kit/sortable` and rebuild `KanbanBoard` so cards can be dragged between stage columns. On drop:
+
+- Optimistically update the cache (card moves immediately).
+- Persist via `supabase.from("leads").update({ lead_stage_id }).eq("id", cardId)`.
+- Write a `workflow_logs` row (`process="lead_stage_change"`, `action="drag_drop"`, from/to stage codes).
+- On error, revert and toast.
+
+Apply the same pattern to other Kanban-capable lists (matches by status, handoffs by status) via a generic `onCardMove(cardId, fromColId, toColId)` prop.
+
+## 4. User / Role / Permission Admin Module
+
+Build a real RBAC console under `/admin/users`, `/admin/roles`, `/admin/permissions`.
+
+### Schema additions (migration)
+
+```sql
+-- new permissions catalog
+create table public.permissions (
+  id uuid primary key default gen_random_uuid(),
+  resource text not null,        -- e.g. 'leads', 'accounts', 'approvals'
+  action   text not null,        -- 'create' | 'read' | 'update' | 'delete' | 'approve' | 'change_status'
+  description text,
+  unique (resource, action)
+);
+
+-- role -> permission mapping (role uses existing app_role enum)
+create table public.role_permissions (
+  role public.app_role not null,
+  permission_id uuid not null references public.permissions(id) on delete cascade,
+  primary key (role, permission_id)
+);
+
+-- helper
+create or replace function public.has_permission(_user uuid, _resource text, _action text)
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (
+    select 1
+    from public.user_roles ur
+    join public.role_permissions rp on rp.role = ur.role
+    join public.permissions p on p.id = rp.permission_id
+    where ur.user_id = _user and p.resource = _resource and p.action = _action
+  )
+$$;
+
+alter table public.permissions enable row level security;
+alter table public.role_permissions enable row level security;
+create policy "perm read" on public.permissions for select to authenticated using (true);
+create policy "perm admin" on public.permissions for all to authenticated
+  using (public.has_role(auth.uid(),'system_admin')) with check (public.has_role(auth.uid(),'system_admin'));
+create policy "rp read" on public.role_permissions for select to authenticated using (true);
+create policy "rp admin" on public.role_permissions for all to authenticated
+  using (public.has_role(auth.uid(),'system_admin')) with check (public.has_role(auth.uid(),'system_admin'));
 ```
 
-- Renders grouped sections (General / Classification / Contact / Financial / Ownership / System).
-- Saves via passed `update(patch)` mutation.
-- After save, computes the diff vs original and writes one `workflow_logs` entry per changed field with `process="field_update"`, `action="edit"`, `field_name`, `from_value`, `to_value`.
-- Loads lookup tables on demand via existing `useLookup`.
+Seed `permissions` with the cross-product of every business resource × CRUD + the special actions `approve`, `reject`, `change_status`, `convert`, `assign`. Seed sensible defaults per role (admin = all; relationship_manager = CRUD on leads/accounts/contacts/activities + read on catalog; approver = read all + approve/reject; catalog_manager = CRUD on catalog; handoff_officer = CRUD on handoffs + change_status; leadership_viewer = read all).
 
-### 2. Per-module field schemas (`src/lib/recordSchemas.ts`)
+### UI
 
-One schema per object covering **every column** the user can legally edit (excludes system audit columns: `id`, `record_number`, `created_at`, `created_by`, `updated_at`, `updated_by`, `is_archived`, AI fields, computed counters):
+- `/admin/users` — table of `user_profiles` joined with `user_roles`. Row actions: change roles (multi-select chips), enable/disable, send password reset (admin client via server function).
+- `/admin/roles` — list of roles, click a role → matrix of resources × actions with checkboxes (writes to `role_permissions`).
+- `/admin/permissions` — read-only catalog (rare to edit).
+- `useAuth()` extended to expose `roles: app_role[]` and `can(resource, action)` helper backed by a single `has_permission` RPC call cached in React Query.
+- All CRUD entrypoints (`New X` button, `Save changes`, row delete, status badges, action buttons) gate on `can(...)`.
 
-- **leads** — full ~40 editable fields, including stage/status/temperature/disqualification/nurture-reason as lookup dropdowns, priority as enum.
-- **accounts** — full ~25 editable fields (category, investor type, status, nationality, country, city, sector, sub_sector, size band, region, funding source/status, timeline, language, owner, etc.).
-- **contacts** — full set: full_name, job_title, email, mobile, contact_role_id, preferred_channel_id, preferred_language, nationality_id, account_id (lookup), lead_id, consent_given + consent_notes, is_primary_contact (handled by dedicated action — see #4).
-- **opportunity_catalog** — title, description, journey_area, min/max_investment, capacity, available_from, expiry_date, currency, required_cr, eligible_investor_type, eligible_nationality_type, required_documents (multi), exclusion_criteria, path_a/b/c_description, etc.
-- **opportunity_matches** — path notes, eligibility_result (enum), missing_requirements, score, match_status_id, manual_override fields.
-- **handoffs** — selected_path_id, owner_id, owner_team_id, package metadata (free fields the user can adjust before submit).
-- **activities** — subject, description, activity_type_id, status_id, outcome_id, due_date, next_follow_up_date, related_object_*.
+## 5. Two-way Activity ↔ Object Linking + Edit-from-anywhere
 
-### 3. Wire `RecordEditor` into every `$id.tsx`
+- Activity already has `related_object_type/id` plus typed FKs. Fix the timeline so any activity row in any object's "Activities" tab opens the same editable activity sheet (reuse `ActivityDrawer` in **edit mode**, prefilled, with a "Save / Save & Complete / Delete" footer).
+- On the activity detail page (`/activities/$id`) add a **"Linked to"** card that shows the related object as `RECORD-NUMBER · Name`, clickable to its detail page, with a "Change link" action to re-point the activity to a different lead/account/contact/match/handoff.
+- When an activity is created/edited from inside an object, the related object FK is locked but still shown.
+- **Activity log/summary**: each related-object Activities tab gets a header strip — counts (Open / Done / Overdue), last activity date, next due date.
 
-For each of `leads`, `accounts`, `contacts`, `catalog`, `matches`, `handoffs`:
-- Replace the partial Overview tab with `<RecordEditor recordType="…" record={x} schema={schemas.x} update={update.mutateAsync} />`.
-- Keep existing action buttons (Convert, Promote, Submit, etc.) — they handle workflow transitions; the editor handles field edits.
-- Add an inline **"Edit"** affordance in the header summary rail: clicking the pencil icon next to any summary field jumps to the Overview tab and focuses the corresponding input.
+## 6. Replace UUIDs with Record Numbers in "Related" UI
 
-### 4. Multiple contacts on Account / Investor
+Audit every place that shows a raw UUID. The fix in each spot is to join the related table and render `record_number · name` (linkable):
 
-- Account `Contacts` tab: keep the inline "Add Contact" dialog but expand its fields to `full_name, job_title, email, mobile, contact_role_id, is_primary_contact`. Multiple contacts can already be added repeatedly — make this explicit with a count badge (`Contacts · 4`) on the tab.
-- "Set Primary" action (on Contact page **and** as a row action in the Contacts tab): when toggled true, run a transactional update that flips all other contacts on the same `account_id` to `is_primary_contact = false` first. Centralized in `src/lib/conversions.ts` as `setPrimaryContact(contactId)`.
-- Add a **"Add Contact"** button directly in the Contact detail header (creates a sibling contact under the same account).
+- `RelatedActivitiesTab` description currently can show ids — render `lead.record_number / account.record_number` via the FK joins.
+- `WorkflowTab` & `ChangesTab`: when `field_name` ends in `_id`, resolve the new/old UUID by querying that table's `record_number` and display "LEAD-000003 (Omar Al-Rashid)" instead of the raw UUID. Cache lookups via React Query to avoid N+1.
+- Account/Contact/Handoff/Match summary cards same treatment.
 
-### 5. Activities detail/edit page (`src/routes/_app/activities/$id.tsx`)
+## 7. Sort / Group-by / Filter on every List
 
-New route. Same `DetailLayout` + `RecordEditor` pattern, plus quick-action buttons: **Mark Complete**, **Reschedule**, **Change Outcome**. Wire links from the global Activities timeline rows to this page (currently they only link to the related object).
+Generalize `DataTable`:
 
-### 6. Row-level Delete (admin only)
+- Add `sortable?: boolean` per column → click header toggles asc/desc with arrow indicator.
+- Add `groupBy?: string` prop and a header dropdown ("Group by: none | Stage | Owner | …") that renders collapsible group rows with counts.
+- Add a `filters` prop that renders an SLDS-style filter bar (chips per active filter, "Add filter" button). Common filters per page (stage, status, owner, date range) defined in each list page.
+- Extract the existing per-page search + select chips into the new filter bar so every module (leads, accounts, contacts, catalog, matches, handoffs, activities, approvals) has the same controls.
 
-Add a kebab-menu in `DataTable` rows with "Delete" (visible only to `system_admin` via `useAuth`). Confirms via dialog, deletes via supabase, invalidates the list query, writes a workflow_log `process="record_delete"`. Applies to leads, accounts, contacts, catalog, matches, handoffs, activities.
+## 8. Fix LEAD-000002 Match → "no match" Bug
 
-### 7. Bug fixes uncovered during audit
+Root cause: `MatchesPanel` queries by `lead_id` and the proposed match (created via the workbench/conversion) was stored under `account_id` after conversion. Fix:
 
-- `src/routes/_app/catalog/$id.tsx` line 25 — conditional `useLookup` call breaks Rules of Hooks. Replace with a single `useLookup("match_statuses")`.
-- `Match` page never renders an Overview tab; add one before "Approval".
-- `Handoff` summary "Source Match" link uses `opportunity_match_id` directly; verify it still resolves after refactor.
-- Contact "Set Primary" currently does not demote the previous primary (data integrity bug).
+- Update query to `or(lead_id.eq.${id}, account_id.eq.${linkedAccountId})` and union the results.
+- Same fix on the Account page Matches tab (mirror by `account_id` plus matches whose `lead_id` belongs to a lead linked to this account).
+- Test with LEAD-000002 to confirm the proposed match now appears.
 
-### 8. Audit / Workflow logging coverage
+## 9. Other Fixes Surfaced
 
-- DB trigger `audit_changes()` already records every insert/update/delete to `audit_logs` — no DB change needed.
-- Every UI save path (`RecordEditor`, action buttons, conversions) additionally writes a `workflow_logs` row so the **Workflow** tab on each record shows a human-readable history (who changed what, when).
-- Add a `process="field_update"` filter chip on the Workflow tab.
+- `RecordEditor` Save bar: relocated as described in §1, resolves the "screen jumps" issue.
+- Account header (image-2) gets the **Edit** affordance (overflow menu → Edit, plus inline pencil on each highlight tile that focuses the field in the Overview form).
+- All header overflow menus expose Delete (admin only via `can('<resource>','delete')`).
 
-### 9. Delete affordance on detail header
+---
 
-Each detail page (admin-only) gets a destructive **"Delete record"** button in the header overflow menu, with a typed-confirm dialog ("type RECORD-NUMBER to delete").
+## Files
 
-## Files to create
+**Created**
+- `supabase/migrations/<ts>_rbac.sql` (permissions + role_permissions + has_permission + seeds)
+- `src/components/RecordHeader.tsx`
+- `src/components/FilterBar.tsx` (rewrite — chips + add-filter)
+- `src/components/dnd/SortableKanban.tsx`
+- `src/lib/permissions.ts` (`useCan` hook + `can()`)
+- `src/lib/recordRefs.ts` (UUID → record_number resolver, cached)
+- `src/routes/_app/admin/users.tsx`
+- `src/routes/_app/admin/roles.tsx`
+- `src/routes/_app/admin/permissions.tsx`
+- `src/server/admin.functions.ts` (server fn for password reset / role assignment using admin client)
 
-- `src/components/RecordEditor.tsx`
-- `src/lib/recordSchemas.ts`
-- `src/routes/_app/activities/$id.tsx`
-- `src/components/DeleteRecordButton.tsx`
+**Edited**
+- `src/styles.css` — new tokens, font, density.
+- `src/components/DetailLayout.tsx` — slim header, optional right-rail.
+- `src/components/DataTable.tsx` — sort, group-by, filters.
+- `src/components/KanbanBoard.tsx` — DnD via dnd-kit + onCardMove.
+- `src/components/RecordEditor.tsx` — non-sticky save toolbar, dirty detection.
+- `src/components/RelatedTabs.tsx` — record-number resolution for Workflow/Changes; activity row → opens edit drawer.
+- `src/components/ActivityDrawer.tsx` — supports edit + delete + link change.
+- `src/lib/auth.tsx` — expose roles + `can()`.
+- `src/routes/_app/leads/$id.tsx` — slim action bar with overflow, drag-friendly StagePath, RecordHeader.
+- `src/routes/_app/leads/index.tsx` — pass onCardMove for drag-drop stage updates.
+- `src/routes/_app/accounts/$id.tsx`, `contacts/$id.tsx`, `catalog/$id.tsx`, `matches/$id.tsx`, `handoffs/$id.tsx`, `activities/$id.tsx` — RecordHeader, edit affordance, permission gating.
+- `src/routes/_app/matches/index.tsx`, `handoffs/index.tsx`, `activities/index.tsx`, `approvals/index.tsx`, `accounts/index.tsx`, `contacts/index.tsx`, `catalog/index.tsx` — sort/group/filter controls.
+- `src/routes/_app/admin/index.tsx` — add Users / Roles / Permissions cards alongside lookup tables.
 
-## Files to edit
+**Dependencies**
+- `bun add @dnd-kit/core @dnd-kit/sortable`
 
-- `src/routes/_app/leads/$id.tsx` — replace OverviewTab with RecordEditor; add Delete; demote-old-primary helper not needed here.
-- `src/routes/_app/accounts/$id.tsx` — replace Editable with RecordEditor; expand Contacts add-form; add Delete; tab badges with counts.
-- `src/routes/_app/contacts/$id.tsx` — replace Edit with RecordEditor; fix Set-Primary to demote others; add "Add sibling Contact" header button.
-- `src/routes/_app/catalog/$id.tsx` — fix bad hook; replace General with RecordEditor covering all fields (including eligibility & paths); add Delete.
-- `src/routes/_app/matches/$id.tsx` — add Overview tab using RecordEditor; add Delete.
-- `src/routes/_app/handoffs/$id.tsx` — add Overview tab using RecordEditor.
-- `src/routes/_app/activities/index.tsx` — make rows link to new `/activities/$id`.
-- `src/components/DataTable.tsx` — add row kebab with admin Delete.
-- `src/lib/conversions.ts` — add `setPrimaryContact`, `deleteRecord` helpers (with logs).
-- `src/components/RelatedTabs.tsx` — Workflow tab: support process filter.
+---
 
-## Out of scope
+## Out of scope for this pass
+- Field-level permissions (resource × action only, like Salesforce Profiles' object permissions).
+- Sharing rules / record-level ownership rules beyond existing RLS.
+- Bulk edit / mass status updates.
 
-- New columns, new tables, new RLS — schema is already complete for everything above.
-- Bulk edit / bulk delete (can be added later).
-
-After this is shipped every page has a complete editable form, every field changes are logged, you can have many contacts per account with a real primary toggle, and admins can delete any record from list or detail.
+After this pass: Salesforce-grade visual feel; clean lead/account headers with a single CTA + overflow; fully functional RBAC with a real Users & Roles admin; drag-drop Kanban that updates the database; activities editable from any object and reverse-linked with a stable record-number reference; every list has sort/group/filter; the LEAD-000002 match bug is fixed; and the bouncing save bar is gone.
