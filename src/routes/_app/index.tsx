@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -11,13 +11,13 @@ export const Route = createFileRoute("/_app/")({ component: Dashboard });
 
 const PIE_COLORS = ["hsl(var(--primary))", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#06b6d4", "#84cc16"];
 
-function Card({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
+function KpiTile({ label, value, hint, to }: { label: string; value: number | string; hint?: string; to: string }) {
   return (
-    <div className="bg-card border rounded-lg p-4">
-      <div className="text-xs uppercase text-muted-foreground">{label}</div>
-      <div className="text-3xl font-semibold mt-1">{value}</div>
+    <Link to={to as any} className="block bg-card border rounded-lg p-4 hover:border-primary hover:shadow-sm transition group">
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="text-3xl font-semibold mt-1 group-hover:text-primary transition">{value}</div>
       {hint && <div className="text-xs text-muted-foreground mt-1">{hint}</div>}
-    </div>
+    </Link>
   );
 }
 
@@ -69,13 +69,13 @@ function Dashboard() {
       <PageHeader title="CRM Dashboard" subtitle="Senaei Investor Journey — Phase 1" />
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-          <Card label="Leads" value={leads.data ?? "…"} />
-          <Card label="Accounts" value={accounts.data ?? "…"} />
-          <Card label="Contacts" value={contacts.data ?? "…"} />
-          <Card label="Catalog" value={catalog.data ?? "…"} />
-          <Card label="Matches" value={matches.data ?? "…"} />
-          <Card label="Handoffs" value={handoffs.data ?? "…"} />
-          <Card label="Activities" value={activities.data ?? "…"} />
+          <KpiTile to="/leads" label="Leads" value={leads.data ?? "…"} />
+          <KpiTile to="/accounts" label="Accounts" value={accounts.data ?? "…"} />
+          <KpiTile to="/contacts" label="Contacts" value={contacts.data ?? "…"} />
+          <KpiTile to="/catalog" label="Catalog" value={catalog.data ?? "…"} />
+          <KpiTile to="/matches" label="Matches" value={matches.data ?? "…"} />
+          <KpiTile to="/handoffs" label="Handoffs" value={handoffs.data ?? "…"} />
+          <KpiTile to="/activities" label="Activities" value={activities.data ?? "…"} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
