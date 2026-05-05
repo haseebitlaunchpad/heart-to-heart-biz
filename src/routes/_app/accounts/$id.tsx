@@ -75,9 +75,9 @@ function AccountDetail() {
         </>}
         tabs={[
           { key: "overview", label: "Overview", render: () => <Editable account={account} update={update.mutateAsync} /> },
-          { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "email", "mobile"]} linkBase="/contacts" /> },
-          { key: "leads", label: "Leads", render: () => <RelatedList table="leads" filter={{ linked_account_id: id }} columns={["record_number", "lead_name", "email", "mobile"]} linkBase="/leads" /> },
-          { key: "matches", label: "Matches", render: () => <RelatedList table="opportunity_matches" filter={{ account_id: id }} columns={["record_number", "eligibility_result"]} linkBase="/matches" /> },
+          { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "email", "mobile"]} linkBase="/contacts" addLabel="Add Contact" addFields={[{key:"full_name",label:"Full name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
+          { key: "leads", label: "Leads", render: () => <RelatedList table="leads" filter={{ linked_account_id: id }} columns={["record_number", "lead_name", "email", "mobile"]} linkBase="/leads" addLabel="New Lead" addFields={[{key:"lead_name",label:"Lead name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
+          { key: "matches", label: "Matches", render: () => <MatchesRelated accountId={id} /> },
           { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
           { key: "changes", label: "Changes", render: () => <ChangesTab objectType="accounts" objectId={id} /> },
           { key: "workflow", label: "Workflow", render: () => <WorkflowTab objectType="accounts" objectId={id} /> },
