@@ -18,7 +18,8 @@ import { schemas } from "@/lib/recordSchemas";
 import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertTriangle, Plus, Target, Send } from "lucide-react";
+import { CheckCircle2, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { createMatchFromLead, submitForApproval } from "@/lib/conversions";
 
 export const Route = createFileRoute("/_app/leads/$id")({ component: LeadDetail });
@@ -101,12 +102,20 @@ function LeadDetail() {
         }
         actions={
           <>
-            <Button size="sm" variant="outline" onClick={() => setActDrawer(true)}><Plus className="h-4 w-4 mr-1" />Log Activity</Button>
-            <Button size="sm" variant="outline" onClick={() => setIdentifyOpen(true)}><AlertTriangle className="h-4 w-4 mr-1" />Identify</Button>
-            <Button size="sm" variant="outline" onClick={() => setMatchOpen(true)}><Target className="h-4 w-4 mr-1" />Create Match</Button>
-            <Button size="sm" variant="outline" onClick={() => setSubmitOpen(true)}><Send className="h-4 w-4 mr-1" />Submit Approval</Button>
-            <Button size="sm" variant="outline" onClick={() => setDisqOpen(true)}>Disqualify</Button>
             <Button size="sm" onClick={() => setConvertOpen(true)}><CheckCircle2 className="h-4 w-4 mr-1" />Convert</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline"><MoreHorizontal className="h-4 w-4" /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setActDrawer(true)}>Log Activity</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIdentifyOpen(true)}>Identify duplicates</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setMatchOpen(true)}>Create Match</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSubmitOpen(true)}>Submit Approval</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setDisqOpen(true)} className="text-destructive">Disqualify</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <DeleteRecordButton table="leads" recordId={id} recordNumber={lead.record_number} redirectTo="/leads" />
           </>
         }
