@@ -12,9 +12,13 @@ import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/RelatedTabs";
 import { ActivityDrawer } from "@/components/ActivityDrawer";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
+import { setPrimaryContact } from "@/lib/conversions";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Crown } from "lucide-react";
+import { Plus, Crown, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_app/accounts/$id")({ component: AccountDetail });
 
@@ -65,6 +69,7 @@ function AccountDetail() {
         actions={<>
           <Button size="sm" variant="outline" onClick={() => setActDrawer(true)}><Plus className="h-4 w-4 mr-1" />Log Activity</Button>
           {!isInvestor && <Button size="sm" onClick={promote}><Crown className="h-4 w-4 mr-1" />Promote to Investor</Button>}
+          <DeleteRecordButton table="accounts" recordId={id} recordNumber={account.record_number} redirectTo="/accounts" />
         </>}
         summary={<>
           <SummaryField label="Email" value={account.primary_email} />
@@ -74,8 +79,8 @@ function AccountDetail() {
           <SummaryField label="Created" value={new Date(account.created_at).toLocaleString()} />
         </>}
         tabs={[
-          { key: "overview", label: "Overview", render: () => <Editable account={account} update={update.mutateAsync} /> },
-          { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "email", "mobile"]} linkBase="/contacts" addLabel="Add Contact" addFields={[{key:"full_name",label:"Full name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
+          { key: "overview", label: "Overview", render: () => <RecordEditor table="accounts" recordId={id} record={account} sections={schemas.accounts} queryKey={["account", id]} /> },
+          { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "job_title", "email", "mobile", "is_primary_contact"]} linkBase="/contacts" addLabel="Add Contact" addFields={[{key:"full_name",label:"Full name",required:true},{key:"job_title",label:"Job title"},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} primaryAction /> },
           { key: "leads", label: "Leads", render: () => <RelatedList table="leads" filter={{ linked_account_id: id }} columns={["record_number", "lead_name", "email", "mobile"]} linkBase="/leads" addLabel="New Lead" addFields={[{key:"lead_name",label:"Lead name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
           { key: "matches", label: "Matches", render: () => <MatchesRelated accountId={id} /> },
           { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
@@ -88,31 +93,8 @@ function AccountDetail() {
   );
 }
 
-function Editable({ account, update }: { account: any; update: (p: any) => Promise<any> }) {
-  const [form, setForm] = useState<any>({
-    account_name: account.account_name, company_name: account.company_name ?? "",
-    primary_email: account.primary_email ?? "", primary_mobile: account.primary_mobile ?? "",
-    cr_number: account.cr_number ?? "", estimated_investment_budget: account.estimated_investment_budget ?? "",
-    financial_notes: account.financial_notes ?? "",
-  });
-  const [busy, setBusy] = useState(false);
-  return (
-    <div className="grid md:grid-cols-2 gap-4 max-w-3xl">
-      {Object.entries(form).map(([k, v]) => (
-        <div key={k} className={k === "financial_notes" ? "md:col-span-2" : ""}>
-          <Label className="capitalize">{k.replaceAll("_", " ")}</Label>
-          {k === "financial_notes" ? <Textarea value={v as any} onChange={(e) => setForm({ ...form, [k]: e.target.value })} /> : <Input value={v as any} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />}
-        </div>
-      ))}
-      <div className="md:col-span-2">
-        <Button disabled={busy} onClick={async () => { setBusy(true); try { await update({ ...form, estimated_investment_budget: form.estimated_investment_budget || null }); toast.success("Saved"); } finally { setBusy(false); } }}>Save</Button>
-      </div>
-    </div>
-  );
-}
-
 type AddField = { key: string; label: string; required?: boolean };
-function RelatedList({ table, filter, columns, linkBase, addLabel, addFields }: { table: string; filter: Record<string, any>; columns: string[]; linkBase: string; addLabel?: string; addFields?: AddField[] }) {
+function RelatedList({ table, filter, columns, linkBase, addLabel, addFields, primaryAction }: { table: string; filter: Record<string, any>; columns: string[]; linkBase: string; addLabel?: string; addFields?: AddField[]; primaryAction?: boolean }) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>({});
@@ -137,27 +119,45 @@ function RelatedList({ table, filter, columns, linkBase, addLabel, addFields }: 
       qc.invalidateQueries({ queryKey: [table, "rel", filter] });
     } catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
   }
+  async function makePrimary(rowId: string) {
+    try {
+      await setPrimaryContact(rowId);
+      toast.success("Set as primary");
+      qc.invalidateQueries({ queryKey: [table, "rel", filter] });
+    } catch (e: any) { toast.error(e.message); }
+  }
   return (
     <div className="space-y-2">
-      {addLabel && addFields && (
-        <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <div className="text-xs text-muted-foreground">{(data as any[]).length} record{(data as any[]).length === 1 ? "" : "s"}</div>
+        {addLabel && addFields && (
           <Button size="sm" variant="outline" onClick={() => setOpen(true)}><Plus className="h-4 w-4 mr-1" />{addLabel}</Button>
-        </div>
-      )}
+        )}
+      </div>
       {!data.length ? <div className="text-sm text-muted-foreground p-6 text-center">None.</div> : (
         <div className="bg-card border rounded">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
-              <tr>{columns.map((c) => <th key={c} className="px-3 py-2 text-left font-medium">{c.replaceAll("_", " ")}</th>)}</tr>
+              <tr>
+                {columns.map((c) => <th key={c} className="px-3 py-2 text-left font-medium">{c.replaceAll("_", " ")}</th>)}
+                {primaryAction && <th className="px-3 py-2"></th>}
+              </tr>
             </thead>
             <tbody>
               {(data as any[]).map((r) => (
                 <tr key={r.id} className="border-t hover:bg-accent/40">
                   {columns.map((c, i) => (
                     <td key={c} className="px-3 py-2">
-                      {i === 0 ? <Link to={`${linkBase}/${r.id}` as any} className="text-primary hover:underline">{r[c] ?? "—"}</Link> : (r[c] ?? "—")}
+                      {i === 0 ? (
+                        <Link to={`${linkBase}/${r.id}` as any} className="text-primary hover:underline">{r[c] ?? "—"}</Link>
+                      ) : c === "is_primary_contact" ? (r[c] ? <span className="inline-flex items-center gap-1 text-amber-600"><Star className="h-3 w-3" />Primary</span> : "—") : (r[c] ?? "—")}
                     </td>
                   ))}
+                  {primaryAction && (
+                    <td className="px-3 py-2 text-right">
+                      {!r.is_primary_contact && <Button size="sm" variant="ghost" onClick={() => makePrimary(r.id)}><Star className="h-3 w-3 mr-1" />Set primary</Button>}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

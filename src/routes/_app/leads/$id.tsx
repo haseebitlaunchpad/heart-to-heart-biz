@@ -13,9 +13,12 @@ import { useLookup, lookupName } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/RelatedTabs";
 import { ActivityDrawer } from "@/components/ActivityDrawer";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertTriangle, Repeat2, UserPlus, Plus, Target, Send } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Plus, Target, Send } from "lucide-react";
 import { createMatchFromLead, submitForApproval } from "@/lib/conversions";
 
 export const Route = createFileRoute("/_app/leads/$id")({ component: LeadDetail });
@@ -104,6 +107,7 @@ function LeadDetail() {
             <Button size="sm" variant="outline" onClick={() => setSubmitOpen(true)}><Send className="h-4 w-4 mr-1" />Submit Approval</Button>
             <Button size="sm" variant="outline" onClick={() => setDisqOpen(true)}>Disqualify</Button>
             <Button size="sm" onClick={() => setConvertOpen(true)}><CheckCircle2 className="h-4 w-4 mr-1" />Convert</Button>
+            <DeleteRecordButton table="leads" recordId={id} recordNumber={lead.record_number} redirectTo="/leads" />
           </>
         }
         summary={
@@ -121,7 +125,7 @@ function LeadDetail() {
           </>
         }
         tabs={[
-          { key: "overview", label: "Overview", render: () => <OverviewTab lead={lead} update={update.mutateAsync} /> },
+          { key: "overview", label: "Overview", render: () => <RecordEditor table="leads" recordId={id} record={lead} sections={schemas.leads} queryKey={["lead", id]} /> },
           { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
           { key: "matches", label: "Matches", render: () => <MatchesPanel leadId={id} /> },
           { key: "changes", label: "Changes", render: () => <ChangesTab objectType="leads" objectId={id} /> },
@@ -246,33 +250,6 @@ function SubmitApprovalDialog({ open, onOpenChange, objectType, objectId }: { op
   );
 }
 
-function OverviewTab({ lead, update }: { lead: any; update: (p: any) => Promise<any> }) {
-  const [form, setForm] = useState<any>({
-    lead_name: lead.lead_name, company_name: lead.company_name ?? "",
-    email: lead.email ?? "", mobile: lead.mobile ?? "",
-    interest_notes: lead.interest_notes ?? "", investment_objective: lead.investment_objective ?? "",
-    cr_number: lead.cr_number ?? "", priority: lead.priority ?? "normal",
-  });
-  const [saving, setSaving] = useState(false);
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
-      {Object.entries(form).map(([k, v]) => (
-        <div key={k} className={k === "interest_notes" || k === "investment_objective" ? "md:col-span-2" : ""}>
-          <Label className="capitalize">{k.replaceAll("_", " ")}</Label>
-          {k === "interest_notes" || k === "investment_objective"
-            ? <Textarea value={v as any} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
-            : <Input value={v as any} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />}
-        </div>
-      ))}
-      <div className="md:col-span-2">
-        <Button disabled={saving} onClick={async () => {
-          setSaving(true);
-          try { await update(form); toast.success("Saved"); } finally { setSaving(false); }
-        }}>{saving ? "Saving…" : "Save changes"}</Button>
-      </div>
-    </div>
-  );
-}
 
 function MatchesPanel({ leadId }: { leadId: string }) {
   const { data = [] } = useQuery({

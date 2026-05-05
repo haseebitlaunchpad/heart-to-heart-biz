@@ -9,6 +9,9 @@ import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { promoteMatchToHandoff } from "@/lib/conversions";
 import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/RelatedTabs";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Send } from "lucide-react";
@@ -101,6 +104,7 @@ function MatchDetail() {
             catch (e: any) { toast.error(e.message); }
           }}><Send className="h-4 w-4 mr-1" />Send to Handoff</Button>
         )}
+        <DeleteRecordButton table="opportunity_matches" recordId={id} recordNumber={m.record_number} redirectTo="/matches" />
       </>}
       summary={<>
         <SummaryField label="Catalog" value={<Link to={`/catalog/${m.catalog_opportunity_id}` as any} className="text-primary">{m.opportunity_catalog?.title}</Link>} />
@@ -110,6 +114,7 @@ function MatchDetail() {
         <SummaryField label="Submitted" value={m.submitted_at ? new Date(m.submitted_at).toLocaleString() : "—"} />
       </>}
       tabs={[
+        { key: "overview", label: "Overview", render: () => <RecordEditor table="opportunity_matches" recordId={id} record={m} sections={schemas.opportunity_matches} queryKey={["match", id]} /> },
         { key: "approval", label: "Approval", render: () => (
           <div className="space-y-4">
             <div className="text-sm">Eligibility: <b>{m.eligibility_result ?? "—"}</b></div>

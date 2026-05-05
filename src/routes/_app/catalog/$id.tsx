@@ -4,12 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { DetailLayout, SummaryField } from "@/components/DetailLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab } from "@/components/RelatedTabs";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,8 +22,7 @@ function CatalogDetail() {
     queryKey: ["catalog", id],
     queryFn: async () => (await supabase.from("opportunity_catalog").select("*").eq("id", id).maybeSingle()).data,
   });
-  const { data: statuses = [] } = useLookup("opportunity_statuses").data ? { data: [] } as any : useLookup("match_statuses");
-  // statuses lookup table may not exist; just use string state below.
+  useLookup("match_statuses");
   const update = useMutation({
     mutationFn: async (patch: any) => {
       const { error } = await (supabase as any).from("opportunity_catalog").update(patch).eq("id", id);
@@ -52,6 +51,7 @@ function CatalogDetail() {
         <Button size="sm" onClick={() => setStatus("published")}>Publish</Button>
         <Button size="sm" variant="outline" onClick={() => setStatus("suspended")}>Suspend</Button>
         <Button size="sm" variant="destructive" onClick={() => setStatus("archived")}>Archive</Button>
+        <DeleteRecordButton table="opportunity_catalog" recordId={id} recordNumber={c.record_number} redirectTo="/catalog" />
       </>}
       summary={<>
         <SummaryField label="Type" value={c.journey_area} />
@@ -62,7 +62,7 @@ function CatalogDetail() {
         <SummaryField label="Expires" value={c.expiry_date} />
       </>}
       tabs={[
-        { key: "general", label: "General", render: () => <General c={c} update={update.mutateAsync} /> },
+        { key: "general", label: "General", render: () => <RecordEditor table="opportunity_catalog" recordId={id} record={c} sections={schemas.opportunity_catalog} queryKey={["catalog", id]} /> },
         { key: "eligibility", label: "Eligibility", render: () => (
           <div className="space-y-2 text-sm">
             <div><b>Required CR:</b> {c.required_cr ? "Yes" : "No"}</div>
@@ -88,19 +88,6 @@ function CatalogDetail() {
   );
 }
 
-function General({ c, update }: { c: any; update: (p: any) => Promise<any> }) {
-  const [f, setF] = useState({ title: c.title, description: c.description ?? "", min_investment: c.min_investment ?? "", max_investment: c.max_investment ?? "", capacity: c.capacity ?? "" });
-  return (
-    <div className="grid md:grid-cols-2 gap-3 max-w-3xl">
-      <div className="md:col-span-2"><Label>Title</Label><Input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
-      <div className="md:col-span-2"><Label>Description</Label><Textarea rows={4} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></div>
-      <div><Label>Min investment</Label><Input value={f.min_investment} onChange={(e) => setF({ ...f, min_investment: e.target.value })} /></div>
-      <div><Label>Max investment</Label><Input value={f.max_investment} onChange={(e) => setF({ ...f, max_investment: e.target.value })} /></div>
-      <div><Label>Capacity</Label><Input value={f.capacity} onChange={(e) => setF({ ...f, capacity: e.target.value })} /></div>
-      <div className="md:col-span-2"><Button onClick={async () => { await update({ ...f, min_investment: f.min_investment || null, max_investment: f.max_investment || null, capacity: f.capacity || null }); toast.success("Saved"); }}>Save</Button></div>
-    </div>
-  );
-}
 
 function Matches({ catalogId }: { catalogId: string }) {
   const { data = [] } = useQuery({ queryKey: ["catalog-matches", catalogId], queryFn: async () => (await supabase.from("opportunity_matches").select("*").eq("catalog_opportunity_id", catalogId).limit(50)).data ?? [] });
