@@ -125,7 +125,7 @@ function LeadDetail() {
           </>
         }
         tabs={[
-          { key: "overview", label: "Overview", render: () => <OverviewTab lead={lead} update={update.mutateAsync} /> },
+          { key: "overview", label: "Overview", render: () => <RecordEditor table="leads" recordId={id} record={lead} sections={schemas.leads} queryKey={["lead", id]} /> },
           { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
           { key: "matches", label: "Matches", render: () => <MatchesPanel leadId={id} /> },
           { key: "changes", label: "Changes", render: () => <ChangesTab objectType="leads" objectId={id} /> },
