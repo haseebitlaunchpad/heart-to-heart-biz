@@ -8,6 +8,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog, writeIntegrationLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab } from "@/components/RelatedTabs";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/handoffs/$id")({ component: HandoffDetail });
@@ -99,6 +102,7 @@ function HandoffDetail() {
         <Button size="sm" onClick={submit}>Submit</Button>
         {h.failed_at && <Button size="sm" variant="outline" onClick={retry}>Retry</Button>}
         <Button size="sm" variant="secondary" onClick={markAccepted}>Mark Accepted</Button>
+        <DeleteRecordButton table="handoffs" recordId={id} recordNumber={h.record_number} redirectTo="/handoffs" />
       </>}
       summary={<>
         <SummaryField label="Source Match" value={h.opportunity_match_id ? <Link to={`/matches/${h.opportunity_match_id}` as any} className="text-primary">View match</Link> : "—"} />
@@ -109,6 +113,7 @@ function HandoffDetail() {
         <SummaryField label="Failure reason" value={h.failure_reason} />
       </>}
       tabs={[
+        { key: "overview", label: "Overview", render: () => <RecordEditor table="handoffs" recordId={id} record={h} sections={schemas.handoffs} queryKey={["handoff", id]} /> },
         { key: "checklist", label: "Checklist", render: () => (
           <div className="space-y-2 max-w-xl">
             {(items as any[]).map((it) => (
