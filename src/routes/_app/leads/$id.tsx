@@ -184,7 +184,65 @@ function LeadDetail() {
       </Dialog>
 
       <ConvertDialog open={convertOpen} onOpenChange={setConvertOpen} lead={lead} onDone={(accountId) => nav({ to: `/accounts/${accountId}` as any })} />
+      <CreateMatchDialog open={matchOpen} onOpenChange={setMatchOpen} leadId={id} onDone={(mId) => nav({ to: `/matches/${mId}` as any })} />
+      <SubmitApprovalDialog open={submitOpen} onOpenChange={setSubmitOpen} objectType="leads" objectId={id} />
     </>
+  );
+}
+
+function CreateMatchDialog({ open, onOpenChange, leadId, onDone }: { open: boolean; onOpenChange: (v: boolean) => void; leadId: string; onDone: (id: string) => void }) {
+  const [catalogId, setCatalogId] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { data: catalog = [] } = useQuery({
+    enabled: open,
+    queryKey: ["catalog-options"],
+    queryFn: async () => (await supabase.from("opportunity_catalog").select("id,title,record_number").eq("is_archived", false).limit(200)).data ?? [],
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Create Match from Lead</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <Label>Catalog Opportunity</Label>
+          <select className="w-full h-9 border rounded px-2 text-sm bg-background" value={catalogId} onChange={(e) => setCatalogId(e.target.value)}>
+            <option value="">Select…</option>
+            {(catalog as any[]).map((c) => <option key={c.id} value={c.id}>{c.record_number} — {c.title}</option>)}
+          </select>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button disabled={!catalogId || busy} onClick={async () => {
+            setBusy(true);
+            try { const id = await createMatchFromLead(leadId, catalogId); toast.success("Match created"); onOpenChange(false); onDone(id); }
+            catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+          }}>{busy ? "Creating…" : "Create"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SubmitApprovalDialog({ open, onOpenChange, objectType, objectId }: { open: boolean; onOpenChange: (v: boolean) => void; objectType: string; objectId: string }) {
+  const [comments, setComments] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Submit for Approval</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <Label>Comments</Label>
+          <Textarea value={comments} onChange={(e) => setComments(e.target.value)} />
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button disabled={busy} onClick={async () => {
+            setBusy(true);
+            try { await submitForApproval(objectType, objectId, comments); toast.success("Submitted"); onOpenChange(false); }
+            catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+          }}>{busy ? "Submitting…" : "Submit"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
