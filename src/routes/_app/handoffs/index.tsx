@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Label } from "@/components/ui/label";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
-import { Plus } from "lucide-react";
+import { Plus, LayoutGrid, List as ListIcon } from "lucide-react";
+import { KanbanBoard } from "@/components/KanbanBoard";
 import { useState } from "react";
 import { toast } from "sonner";
 
