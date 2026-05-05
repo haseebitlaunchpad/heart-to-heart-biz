@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -13,9 +14,12 @@ import { useState } from "react";
 export const Route = createFileRoute("/_app/activities/")({ component: ActivitiesPage });
 
 function ActivitiesPage() {
+  const sp = useSearch({ strict: false }) as any;
   const [search, setSearch] = useState("");
   const [typeId, setTypeId] = useState("");
+  const [overdueOnly, setOverdueOnly] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  useEffect(() => { if (sp?.overdue === "1" || sp?.overdue === 1) setOverdueOnly(true); }, [sp?.overdue]);
   const { data: types = [] } = useLookup("activity_types");
   const { data: rows = [] } = useQuery({
     queryKey: ["activities-all"],
