@@ -101,6 +101,7 @@ function HandoffDetail() {
         <Button size="sm" variant="secondary" onClick={markAccepted}>Mark Accepted</Button>
       </>}
       summary={<>
+        <SummaryField label="Source Match" value={h.opportunity_match_id ? <Link to={`/matches/${h.opportunity_match_id}` as any} className="text-primary">View match</Link> : "—"} />
         <SummaryField label="Account" value={h.accounts ? <Link to={`/accounts/${h.accounts.id}` as any} className="text-primary">{h.accounts.account_name}</Link> : "—"} />
         <SummaryField label="Submitted" value={h.submitted_at ? new Date(h.submitted_at).toLocaleString() : "—"} />
         <SummaryField label="Accepted" value={h.accepted_at ? new Date(h.accepted_at).toLocaleString() : "—"} />

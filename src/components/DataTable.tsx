@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
+import { useNavigate, Link } from "@tanstack/react-router";
 
 export type Column<T> = { key: string; header: string; render?: (row: T) => ReactNode };
 
 export function DataTable<T extends { id: string }>({
   rows, columns, linkBase, empty = "No records found.",
 }: { rows: T[]; columns: Column<T>[]; linkBase?: string; empty?: string }) {
+  const navigate = useNavigate();
   if (!rows.length) {
     return <div className="p-8 text-center text-sm text-muted-foreground">{empty}</div>;
   }
@@ -19,11 +21,22 @@ export function DataTable<T extends { id: string }>({
             <tr
               key={row.id}
               className="hover:bg-accent/40 cursor-pointer border-t"
-              onClick={() => linkBase && (window.location.href = `${linkBase}/${row.id}`)}
+              onClick={(e) => {
+                if (!linkBase) return;
+                const target = e.target as HTMLElement;
+                if (target.closest("a,button,input,select,textarea")) return;
+                navigate({ to: `${linkBase}/${row.id}` as any });
+              }}
             >
-              {columns.map((c) => (
+              {columns.map((c, idx) => (
                 <td key={c.key} className="px-4 py-2">
-                  {c.render ? c.render(row) : (row as any)[c.key] ?? "—"}
+                  {idx === 0 && linkBase ? (
+                    <Link to={`${linkBase}/${row.id}` as any} className="text-foreground hover:text-primary hover:underline">
+                      {c.render ? c.render(row) : (row as any)[c.key] ?? "—"}
+                    </Link>
+                  ) : (
+                    c.render ? c.render(row) : (row as any)[c.key] ?? "—"
+                  )}
                 </td>
               ))}
             </tr>

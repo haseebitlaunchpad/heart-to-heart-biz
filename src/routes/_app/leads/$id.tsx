@@ -15,7 +15,8 @@ import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/Rela
 import { ActivityDrawer } from "@/components/ActivityDrawer";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertTriangle, Repeat2, UserPlus, Plus } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Repeat2, UserPlus, Plus, Target, Send } from "lucide-react";
+import { createMatchFromLead, submitForApproval } from "@/lib/conversions";
 
 export const Route = createFileRoute("/_app/leads/$id")({ component: LeadDetail });
 
@@ -29,6 +30,8 @@ function LeadDetail() {
   const [disqOpen, setDisqOpen] = useState(false);
   const [disqReasonId, setDisqReasonId] = useState("");
   const [disqNote, setDisqNote] = useState("");
+  const [matchOpen, setMatchOpen] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
 
   const { data: lead, isLoading } = useQuery({
     queryKey: ["lead", id],
@@ -97,6 +100,8 @@ function LeadDetail() {
           <>
             <Button size="sm" variant="outline" onClick={() => setActDrawer(true)}><Plus className="h-4 w-4 mr-1" />Log Activity</Button>
             <Button size="sm" variant="outline" onClick={() => setIdentifyOpen(true)}><AlertTriangle className="h-4 w-4 mr-1" />Identify</Button>
+            <Button size="sm" variant="outline" onClick={() => setMatchOpen(true)}><Target className="h-4 w-4 mr-1" />Create Match</Button>
+            <Button size="sm" variant="outline" onClick={() => setSubmitOpen(true)}><Send className="h-4 w-4 mr-1" />Submit Approval</Button>
             <Button size="sm" variant="outline" onClick={() => setDisqOpen(true)}>Disqualify</Button>
             <Button size="sm" onClick={() => setConvertOpen(true)}><CheckCircle2 className="h-4 w-4 mr-1" />Convert</Button>
           </>
@@ -179,7 +184,65 @@ function LeadDetail() {
       </Dialog>
 
       <ConvertDialog open={convertOpen} onOpenChange={setConvertOpen} lead={lead} onDone={(accountId) => nav({ to: `/accounts/${accountId}` as any })} />
+      <CreateMatchDialog open={matchOpen} onOpenChange={setMatchOpen} leadId={id} onDone={(mId) => nav({ to: `/matches/${mId}` as any })} />
+      <SubmitApprovalDialog open={submitOpen} onOpenChange={setSubmitOpen} objectType="leads" objectId={id} />
     </>
+  );
+}
+
+function CreateMatchDialog({ open, onOpenChange, leadId, onDone }: { open: boolean; onOpenChange: (v: boolean) => void; leadId: string; onDone: (id: string) => void }) {
+  const [catalogId, setCatalogId] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { data: catalog = [] } = useQuery({
+    enabled: open,
+    queryKey: ["catalog-options"],
+    queryFn: async () => (await supabase.from("opportunity_catalog").select("id,title,record_number").eq("is_archived", false).limit(200)).data ?? [],
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Create Match from Lead</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <Label>Catalog Opportunity</Label>
+          <select className="w-full h-9 border rounded px-2 text-sm bg-background" value={catalogId} onChange={(e) => setCatalogId(e.target.value)}>
+            <option value="">Select…</option>
+            {(catalog as any[]).map((c) => <option key={c.id} value={c.id}>{c.record_number} — {c.title}</option>)}
+          </select>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button disabled={!catalogId || busy} onClick={async () => {
+            setBusy(true);
+            try { const id = await createMatchFromLead(leadId, catalogId); toast.success("Match created"); onOpenChange(false); onDone(id); }
+            catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+          }}>{busy ? "Creating…" : "Create"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SubmitApprovalDialog({ open, onOpenChange, objectType, objectId }: { open: boolean; onOpenChange: (v: boolean) => void; objectType: string; objectId: string }) {
+  const [comments, setComments] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Submit for Approval</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <Label>Comments</Label>
+          <Textarea value={comments} onChange={(e) => setComments(e.target.value)} />
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button disabled={busy} onClick={async () => {
+            setBusy(true);
+            try { await submitForApproval(objectType, objectId, comments); toast.success("Submitted"); onOpenChange(false); }
+            catch (e: any) { toast.error(e.message); } finally { setBusy(false); }
+          }}>{busy ? "Submitting…" : "Submit"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

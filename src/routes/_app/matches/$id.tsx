@@ -1,4 +1,4 @@
-import { createFileRoute, useParams, Link } from "@tanstack/react-router";
+import { createFileRoute, useParams, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DetailLayout, SummaryField } from "@/components/DetailLayout";
@@ -7,15 +7,18 @@ import { ApprovalActions } from "@/components/ApprovalActions";
 import { Button } from "@/components/ui/button";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
+import { promoteMatchToHandoff } from "@/lib/conversions";
 import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/RelatedTabs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Send } from "lucide-react";
 
 export const Route = createFileRoute("/_app/matches/$id")({ component: MatchDetail });
 
 function MatchDetail() {
   const { id } = useParams({ from: "/_app/matches/$id" });
   const qc = useQueryClient();
+  const nav = useNavigate();
   const { data: m, isLoading } = useQuery({
     queryKey: ["match", id],
     queryFn: async () => (await supabase.from("opportunity_matches").select("*, opportunity_catalog(*), leads(id,lead_name), accounts(id,account_name)").eq("id", id).maybeSingle()).data,
@@ -92,6 +95,12 @@ function MatchDetail() {
       actions={<>
         <Button size="sm" variant="outline" onClick={runEligibility}>Run Eligibility</Button>
         <Button size="sm" onClick={submit}>Submit for Approval</Button>
+        {aps?.code === "APPROVED" && (
+          <Button size="sm" variant="default" onClick={async () => {
+            try { const hid = await promoteMatchToHandoff(id); toast.success("Handoff created"); nav({ to: `/handoffs/${hid}` as any }); }
+            catch (e: any) { toast.error(e.message); }
+          }}><Send className="h-4 w-4 mr-1" />Send to Handoff</Button>
+        )}
       </>}
       summary={<>
         <SummaryField label="Catalog" value={<Link to={`/catalog/${m.catalog_opportunity_id}` as any} className="text-primary">{m.opportunity_catalog?.title}</Link>} />

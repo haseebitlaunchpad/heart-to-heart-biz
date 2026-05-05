@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useLookup } from "@/lib/lookups";
-import { writeWorkflowLog } from "@/lib/logs";
+import { decideApproval } from "@/lib/conversions";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -34,15 +34,7 @@ function ApprovalsList() {
 
   const decide = useMutation({
     mutationFn: async ({ row, kind, note }: { row: any; kind: "approve" | "reject"; note: string }) => {
-      const target = (statuses as any[]).find((s) => s.code === (kind === "approve" ? "APPROVED" : "REJECTED"));
-      const { data: u } = await supabase.auth.getUser();
-      const { error } = await (supabase as any).from("approvals").update({
-        approval_status_id: target?.id,
-        decision: kind, decided_at: new Date().toISOString(), decided_by: u.user?.id,
-        comments: note, rejection_reason: kind === "reject" ? note : null,
-      }).eq("id", row.id);
-      if (error) throw error;
-      await writeWorkflowLog({ process: "approval_decide", objectType: "approvals", objectId: row.id, toStatus: kind, action: kind, comments: note });
+      await decideApproval(row.id, kind === "approve" ? "approved" : "rejected", note);
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["approvals"] }); toast.success("Decision recorded"); setDecisionRow(null); setComments(""); },
     onError: (e: any) => toast.error(e.message),
