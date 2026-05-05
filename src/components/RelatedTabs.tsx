@@ -1,8 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Timeline, TimelineItem } from "@/components/Timeline";
 import { RecordRef } from "@/components/RecordRef";
 import { FK_TABLE_MAP, isUuid } from "@/lib/recordRefs";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, Plus, Pencil } from "lucide-react";
+import { writeWorkflowLog } from "@/lib/logs";
+import { toast } from "sonner";
+import { ActivityDrawer } from "@/components/ActivityDrawer";
 
 export function ChangesTab({ objectType, objectId }: { objectType: string; objectId: string }) {
   const { data = [] } = useQuery({
@@ -96,7 +103,14 @@ export function WorkflowTab({ objectType, objectId }: { objectType: string; obje
   return <Timeline items={items} />;
 }
 
-export function RelatedActivitiesTab({ relatedId }: { relatedId: string }) {
+export function RelatedActivitiesTab({
+  relatedId, relatedType,
+}: {
+  relatedId: string;
+  relatedType?: "lead" | "account" | "contact" | "opportunity_match" | "handoff";
+}) {
+  const qc = useQueryClient();
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { data = [] } = useQuery({
     queryKey: ["related-activities", relatedId],
     queryFn: async () => {
@@ -109,12 +123,56 @@ export function RelatedActivitiesTab({ relatedId }: { relatedId: string }) {
       return data ?? [];
     },
   });
+
+  const complete = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase as any).from("activities").update({ completed_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw error;
+      await writeWorkflowLog({ process: "activity_complete", objectType: "activities", objectId: id, action: "complete" });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["related-activities", relatedId] });
+      toast.success("Marked complete");
+    },
+    onError: (e: any) => toast.error(e.message ?? "Failed"),
+  });
+
   const items: TimelineItem[] = (data as any[]).map((r) => ({
     id: r.id,
-    title: r.subject,
+    title: (
+      <div className="flex items-center gap-2">
+        <Link to={"/activities/$id" as any} params={{ id: r.id } as any} className="hover:text-primary font-medium flex items-center gap-1">
+          {r.subject}
+          <Pencil className="h-3 w-3 opacity-50" />
+        </Link>
+        {!r.completed_at && (
+          <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => complete.mutate(r.id)}>
+            <CheckCircle2 className="h-3 w-3 mr-1" />Complete
+          </Button>
+        )}
+      </div>
+    ) as any,
     description: r.description,
-    meta: r.completed_at ? `Completed ${new Date(r.completed_at).toLocaleString()}` : (r.due_date ? `Due ${new Date(r.due_date).toLocaleString()}` : "Open"),
+    meta: <>
+      {r.completed_at ? `Completed ${new Date(r.completed_at).toLocaleString()}` : (r.due_date ? `Due ${new Date(r.due_date).toLocaleString()}` : "Open")}
+      {r.owner_id && <> · Owner: <RecordRef table="user_profiles" id={r.owner_id} /></>}
+    </> as any,
     timestamp: r.created_at,
   }));
-  return <Timeline items={items} />;
+
+  return (
+    <div className="space-y-3">
+      {relatedType && (
+        <div className="flex justify-end">
+          <Button size="sm" onClick={() => setDrawerOpen(true)}>
+            <Plus className="h-4 w-4 mr-1" />Log activity
+          </Button>
+        </div>
+      )}
+      <Timeline items={items} />
+      {relatedType && (
+        <ActivityDrawer open={drawerOpen} onOpenChange={setDrawerOpen} relatedType={relatedType} relatedId={relatedId} />
+      )}
+    </div>
+  );
 }

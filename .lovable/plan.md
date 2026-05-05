@@ -1,124 +1,74 @@
-
-Single consolidated plan covering everything still pending from the previous turns plus the new admin grouping ask.
-
-## 1. Admin setup — group by system function
-
-`src/routes/_app/admin/index.tsx` rewritten as collapsible accordion sections (shadcn `Accordion`), each section a labeled grid of setup cards. Section title strip uses an icon + count of tables in the group.
-
-Groups:
-- **Access control** — Users, Roles & Permissions
-- **Lead management** — `lead_stages`, `lead_statuses`, `lead_temperatures`, `lead_source_channels`, `lead_disqualification_reasons`, `lead_nurture_reasons`
-- **Account & contact** — `account_categories`, `account_statuses`, `investor_types`, `contact_roles`
-- **Activities** — `activity_types`, `activity_statuses`, `activity_outcomes`
-- **Opportunities & matching** — `match_statuses`, `investment_size_bands`, `investment_paths`, `investment_timelines`, `funding_sources`, `funding_statuses`, `lifecycle_phases`
-- **Approvals & handoffs** — `approval_statuses`, `handoff_statuses`, `handoff_checklist_items`, `integration_statuses`
-- **Geography & localization** — `countries`, `cities`, `currencies`, `languages`, `communication_channels`
-- **Automation** — `assignment_rules` (link card to a future page)
-- **Audit & integration logs** — read-only links to `audit_logs`, `integration_logs`, `duplicate_logs`
-
-Each card keeps the live record count. Add a search input at the top that filters cards by label across all groups.
-
-## 2. UUID → RecordRef cleanup (carried over)
-
-- Extend `recordRefs.ts` with `user_profiles` resolver (full_name || email) and add `owner_id`, `assigned_to`, `created_by`, `updated_by`, `submitted_by`, `decided_by`, `requested_by` to `FK_TABLE_MAP`.
-- `RelatedTabs.tsx` (Workflow + Changes): when value is UUID or `field_name` is in the map, render `<RecordRef />`. Resolve status_id values via lookup tables.
-- Detail pages (`accounts/$id`, `contacts/$id`, `leads/$id`, `matches/$id`, `handoffs/$id`, `catalog/$id`, `activities/$id`): replace any UUID-printing summary field with `<RecordRef />`.
-- `activities/$id.tsx`: Related card uses `<RecordRef />` plus a **Change Link** button.
-
-## 3. Kanban: click vs drag + DnD on matches & handoffs
-
-`KanbanBoard.tsx`: card body wraps `<Link>` only; new `⋮⋮` drag-handle at top-right carries `setNodeRef + listeners`. Activation distance stays 4px.
-
-Wire `onCardMove` for:
-- `matches/index.tsx` → updates `match_status_id` + writes `workflow_logs` (`process="match_status_change"`).
-- `handoffs/index.tsx` → updates `handoff_status_id` + log.
-- Add View toggle (Table | Kanban) to matches and handoffs lists (leads already has it).
-
-Optimistic update with rollback on error.
-
-## 4. Two-way Activity ↔ object linking
-
-- `ActivityDrawer.tsx` extended to **edit mode** (load by id, footer = Save / Save & Complete / Delete).
-- All "Activities" tabs in object detail pages: row click opens drawer in edit mode; ↗ icon goes to `/activities/$id`.
-- `activities/$id.tsx`: Change Link → `RelatedObjectPicker` updates both `related_object_type/id` and the typed FK column.
-- Each Activities tab gets a header strip: Open / Done / Overdue counts, last & next due.
-
-## 5. Global Search (SAP/Salesforce-style omni-search)
-
-Top-bar input becomes a `CommandDialog` (Cmd/Ctrl-K) with debounced (200 ms) input. New file `src/components/GlobalSearch.tsx`.
-
-- Parallel `ilike` queries across leads, accounts, contacts, opportunity_catalog, opportunity_matches, handoffs, activities, approvals (relevant text columns + record_number; tokens AND-ed for fuzzy feel).
-- Results grouped by object with icon + record_number + name + secondary meta. Each group shows a "Search in <module>" jump.
-- Recent records (last 5 visited, localStorage) shown when query empty.
-- Keyboard navigation; Enter → navigate to detail. 50-entry React Query cache, 30s stale-time.
-- Mount in `AppShell.tsx` and bind ⌘K shortcut.
-
-Optional: minor `pg_trgm` index migration on hot name columns only if perf demands.
-
-## 6. Enterprise dashboard revamp + clickable KPIs
-
-`src/routes/_app/index.tsx` rewritten:
-
-```text
-Greeting (name · role · date)
-KPI tiles (8, dense, accent bar, 7-day delta, all <Link>)
-  Leads · Accounts · Contacts · Catalog
-  My Open Leads · Pending Approvals · Overdue Activities · Hot Matches
-Lead Funnel (bar, click → /leads?stage=…)  | Matches by Status (donut, click → /matches?status=…)
-My Open Tasks (top 5)
-Recent Activity (10)                       | Pending Approvals (5, inline approve)
-```
-
-KPI links carry search params:
-- My Open Leads → `/leads?owner=me&open=1`
-- Pending Approvals → `/approvals?status=pending`
-- Overdue Activities → `/activities?overdue=1`
-- Hot Matches → `/matches?status=proposed`
-
-Quick Actions row (gated by `useCan`): New Lead · Log Activity · Convert · Submit Approval.
-
-New `src/components/dashboard/`: `KpiTile`, `Greeting`, `MyTasks`, `RecentActivity`, `PendingApprovalsCard`.
-
-## 7. Lists: sort / group / filter / search-param-driven
-
-Apply `DataTable` sort/group/filter to all list pages: accounts, contacts, catalog, matches, handoffs, activities, approvals (leads done).
-
-Each list adds Zod `validateSearch` (with `@tanstack/zod-adapter` `fallback`) so dashboard deep-links work:
-- leads: `owner`, `stage`, `temperature`, `open`
-- matches: `status`
-- approvals: `status`
-- activities: `overdue`, `assignee`
-
-Filter chip bar: removable chips for active filters; "Add filter" picks from a per-page registry. Sort/group choice persisted in URL.
+## Goals
+1. Make activities editable from Lead / Account / Contact / Match detail pages.
+2. Allow assigning an Owner when creating/editing an activity.
+3. Remove the per-page search bar on Matches (and other lists) — let users use the single global ⌘K bar in the header.
+4. Seed 10 realistic Opportunity Matches use-cases for demo/testing.
 
 ---
 
-## Files
+## 1. Editable activities from related objects
+**File:** `src/components/RelatedTabs.tsx` → `RelatedActivitiesTab`
 
-**Created**
+- Replace the read-only `Timeline` rendering with rows that:
+  - Link the subject to `/activities/$id` (so users can open & fully edit using the existing `ActivityDetail` page that already has `RecordEditor`).
+  - Show a small "Mark complete" button inline for open items (mutates `completed_at` + writes workflow log).
+  - Show owner avatar/name (resolved via `RecordRef table="user_profiles"`).
+- Add a "+ Log activity" button at the top of the tab that opens `ActivityDrawer` pre-linked to the parent record (drawer already supports this; just wire the button — currently it's only in some detail pages).
+- Ensure the tab is added consistently. Already present on leads/accounts/contacts/matches; verify handoffs detail also has it.
+
+## 2. Owner on activities
+**Files:** `src/components/ActivityDrawer.tsx`, `src/lib/recordSchemas.ts`
+
+- Add an `Owner` select to `ActivityDrawer` populated from `user_profiles` (default = current user). Persist to `activities.owner_id`.
+- Add `owner_id` field (type: user picker) to the `activities` schema in `recordSchemas.ts` so it shows up & is editable in `RecordEditor` on the activity detail page (and from the related-activities tab via the link).
+- The `owner_id` column already exists on `activities` (used in `ActivityDrawer`) — no migration needed.
+
+## 3. Unified search — drop per-page search bars
+**Files:** `src/components/FilterBar.tsx`, list pages
+(`matches/index.tsx`, `leads/index.tsx`, `accounts/index.tsx`, `contacts/index.tsx`,
+`catalog/index.tsx`, `handoffs/index.tsx`, `activities/index.tsx`,
+`approvals/index.tsx`)
+
+- Make the `search` input in `FilterBar` optional. When the parent doesn't pass `search`/`onSearch`, render only the filter chips/children.
+- On `Matches` page (per the screenshot/request), remove the local search input — keep only status/score filters. Users search matches via the header ⌘K bar.
+- Improve `GlobalSearch` UX so it also feels like the page search:
+  - When a result is selected on a list-type group (e.g. Matches), navigate directly to the detail page (already does).
+  - Add a "View all results in {Module}" footer item per group that navigates to `/{module}?q=...`, and have each list page accept an optional `?q=` search param to pre-filter rows in memory (no schema change).
+
+## 4. Seed 10 realistic Opportunity Matches
+Insert via migration into `opportunity_matches` (and any minimally required parent rows that don't already exist) with realistic Saudi-market food-distribution scenarios such as:
+
+| # | Lead / Account | Catalog item | Status | Score |
+|---|----------------|--------------|--------|-------|
+| 1 | Qahtani Foods | Premium Olive Oil – 5L | Proposed | 88 |
+| 2 | Al-Othaim Markets | Frozen Seafood Bundle | Qualified | 76 |
+| 3 | Tamimi Markets | Organic Dates – Bulk | Won | 92 |
+| 4 | Panda Retail | Dairy SKU Refresh Q3 | In Review | 64 |
+| 5 | Danube | Halal Meat Premium | Proposed | 81 |
+| 6 | Lulu Hypermarket | Ramadan Gift Hampers | Qualified | 70 |
+| 7 | Carrefour KSA | Long-life Bakery | Lost | 42 |
+| 8 | Hyper Mall | Imported Pasta Range | Proposed | 58 |
+| 9 | Manuel Market | Local Honey Range | Qualified | 73 |
+| 10 | Nesto | Beverage Innovation Pilot | Won | 95 |
+
+Each row uses existing status / lead / account / catalog UUIDs where present; otherwise the migration first upserts placeholder catalog/account rows so FKs resolve, then inserts the matches.
+
+---
+
+## Technical notes
+- No table-shape changes. Migration is data-only (insert seed matches + any missing FK parents).
+- `RelatedActivitiesTab` becomes a thin list of `Link`s, so clicking opens the existing fully-editable `ActivityDetail` route — that's the cleanest "make it editable" path without duplicating editors.
+- `FilterBar` change is backwards compatible (props become optional).
+- `GlobalSearch` already has debounced multi-table `ilike` — adding "View all" footer rows is a small render addition.
+
+## Files touched
+- `src/components/RelatedTabs.tsx`
+- `src/components/ActivityDrawer.tsx`
+- `src/components/FilterBar.tsx`
 - `src/components/GlobalSearch.tsx`
-- `src/components/RelatedObjectPicker.tsx`
-- `src/components/dashboard/{KpiTile,Greeting,MyTasks,RecentActivity,PendingApprovalsCard}.tsx`
+- `src/lib/recordSchemas.ts`
+- `src/routes/_app/matches/index.tsx` (+ other list pages: optional `?q=` param)
+- `src/routes/_app/handoffs/$id.tsx` (verify activities tab)
+- new SQL migration: seed 10 opportunity matches
 
-**Edited**
-- `src/routes/_app/admin/index.tsx` — grouped accordion + search.
-- `src/routes/_app/index.tsx` — full dashboard revamp.
-- `src/components/KanbanBoard.tsx` — drag handle, click-through link.
-- `src/components/RelatedTabs.tsx` — RecordRef everywhere.
-- `src/components/ActivityDrawer.tsx` — edit/delete/relink.
-- `src/components/AppShell.tsx` — mount GlobalSearch + ⌘K.
-- `src/lib/recordRefs.ts` — user_profiles + extra FK map entries.
-- `src/routes/_app/{leads,matches,handoffs,accounts,contacts,catalog,activities,approvals}/index.tsx` — `validateSearch`, sort/group/filter; matches+handoffs add Kanban view + onCardMove.
-- `src/routes/_app/{accounts,contacts,leads,matches,handoffs,catalog,activities}/$id.tsx` — RecordRef cleanup; activity Change Link.
-
-**Optional**
-- `supabase/migrations/<ts>_search_indexes.sql` — `pg_trgm` GIN indexes if perf needs it.
-
-No other schema changes.
-
----
-
-## Out of scope
-- Server-side full-text ranking with tsvector/tsquery (client-merged ilike is sufficient at current data volume).
-- Per-user dashboard customization / drag-rearrange.
-- Bulk edit on lists.
+Once approved I'll implement all four in one pass.

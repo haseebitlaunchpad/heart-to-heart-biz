@@ -194,6 +194,7 @@ export const schemas: Record<string, Section[]> = {
       { key: "activity_type_id", label: "Type", type: "lookup", table: "activity_types" },
       { key: "status_id", label: "Status", type: "lookup", table: "activity_statuses" },
       { key: "outcome_id", label: "Outcome", type: "lookup", table: "activity_outcomes" },
+      { key: "owner_id", label: "Owner", type: "lookup", table: "user_profiles" },
       { key: "due_date", label: "Due date", type: "datetime" },
       { key: "completed_at", label: "Completed at", type: "datetime" },
       { key: "next_follow_up_date", label: "Next follow-up", type: "date" },

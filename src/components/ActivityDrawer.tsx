@@ -25,13 +25,19 @@ export function ActivityDrawer({
   const [statusId, setStatusId] = useState<string>("");
   const [outcomeId, setOutcomeId] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
+  const [ownerId, setOwnerId] = useState<string>("");
 
   const { data: types = [] } = useQuery({ queryKey: ["activity_types"], queryFn: async () => (await supabase.from("activity_types").select("*").eq("is_active", true)).data ?? [] });
   const { data: statuses = [] } = useQuery({ queryKey: ["activity_statuses"], queryFn: async () => (await supabase.from("activity_statuses").select("*").eq("is_active", true)).data ?? [] });
   const { data: outcomes = [] } = useQuery({ queryKey: ["activity_outcomes"], queryFn: async () => (await supabase.from("activity_outcomes").select("*").eq("is_active", true)).data ?? [] });
+  const { data: users = [] } = useQuery({ queryKey: ["user_profiles_lite"], queryFn: async () => (await supabase.from("user_profiles").select("id, full_name, email").order("full_name")).data ?? [] });
 
   useEffect(() => {
     if (open) {
+      (async () => {
+        const { data: u } = await supabase.auth.getUser();
+        setOwnerId(u.user?.id ?? "");
+      })();
       setSubject(defaultSubject ?? "");
       setDescription(""); setOutcomeId(""); setDueDate("");
       setTypeId((types[0] as any)?.id ?? "");
@@ -51,7 +57,7 @@ export function ActivityDrawer({
         due_date: dueDate || null,
         related_object_type: relatedType,
         related_object_id: relatedId,
-        owner_id: u.user?.id, created_by: u.user?.id,
+        owner_id: ownerId || u.user?.id, created_by: u.user?.id,
         completed_at: mode === "save_complete" ? new Date().toISOString() : null,
       };
       if (relatedType === "lead") payload.lead_id = relatedId;
@@ -103,6 +109,12 @@ export function ActivityDrawer({
               </select>
             </div>
             <div><Label>Due date</Label><Input type="datetime-local" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></div>
+          </div>
+          <div><Label>Owner</Label>
+            <select className="w-full h-9 border rounded px-2 bg-background text-sm" value={ownerId} onChange={(e) => setOwnerId(e.target.value)}>
+              <option value="">—</option>
+              {(users as any[]).map((u) => <option key={u.id} value={u.id}>{u.full_name ?? u.email}</option>)}
+            </select>
           </div>
           <div><Label>Description</Label><Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} /></div>
         </div>

@@ -6,9 +6,11 @@ export function useLookup(table: string, opts: { activeOnly?: boolean; orderBy?:
   return useQuery({
     queryKey: ["lookup", table, activeOnly, orderBy],
     queryFn: async () => {
+      const noActiveCol = table === "user_profiles";
       let q: any = (supabase as any).from(table).select("*");
-      if (activeOnly) q = q.eq("is_active", true);
+      if (activeOnly && !noActiveCol) q = q.eq("is_active", true);
       if (orderBy) q = q.order(orderBy, { ascending: true });
+      else if (noActiveCol) q = q.order("full_name", { ascending: true });
       const { data, error } = await q;
       if (error) throw error;
       return data as any[];
