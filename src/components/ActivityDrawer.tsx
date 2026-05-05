@@ -110,6 +110,12 @@ export function ActivityDrawer({
             </div>
             <div><Label>Due date</Label><Input type="datetime-local" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></div>
           </div>
+          <div><Label>Owner</Label>
+            <select className="w-full h-9 border rounded px-2 bg-background text-sm" value={ownerId} onChange={(e) => setOwnerId(e.target.value)}>
+              <option value="">—</option>
+              {(users as any[]).map((u) => <option key={u.id} value={u.id}>{u.full_name ?? u.email}</option>)}
+            </select>
+          </div>
           <div><Label>Description</Label><Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} /></div>
         </div>
         <div className="flex flex-wrap gap-2 mt-5">
