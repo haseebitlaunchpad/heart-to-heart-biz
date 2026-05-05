@@ -38,9 +38,9 @@ function MatchDetail() {
   const aps = (approvalStatuses as any[]).find((s) => s.id === m.approval_status_id);
 
   async function runEligibility() {
-    const cat: any = m.opportunity_catalog;
+    const cat: any = (m as any)?.opportunity_catalog;
     const missing: string[] = [];
-    if (cat?.required_cr && !m.accounts?.id) missing.push("CR/account required");
+    if (cat?.required_cr && !(m as any)?.accounts?.id) missing.push("CR/account required");
     const result = missing.length ? "ineligible" : "eligible";
     await update.mutateAsync({ eligibility_result: result, missing_requirements: missing });
     await writeWorkflowLog({ process: "match_eligibility", objectType: "opportunity_matches", objectId: id, toStatus: result, action: "run_eligibility" });
