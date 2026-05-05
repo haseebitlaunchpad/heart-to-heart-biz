@@ -65,10 +65,10 @@ function HandoffDetail() {
     await update.mutateAsync({
       handoff_status_id: submitted?.id, integration_status_id: successStatus?.id,
       submitted_at: new Date().toISOString(), submitted_by: u.user?.id,
-      retry_count: (h.retry_count ?? 0) + 1,
+      retry_count: ((h as any)?.retry_count ?? 0) + 1,
       failure_reason: success ? null : "Mock integration timeout",
       failed_at: success ? null : new Date().toISOString(),
-      package_payload: { catalog: h.opportunity_catalog?.title, account: h.accounts?.account_name, checklist },
+      package_payload: { catalog: (h as any)?.opportunity_catalog?.title, account: (h as any)?.accounts?.account_name, checklist },
     });
     await writeIntegrationLog({
       name: "senaei_handoff_mock", direction: "outbound", relatedType: "handoffs", relatedId: id,
