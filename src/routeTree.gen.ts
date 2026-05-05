@@ -23,6 +23,8 @@ import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppActivitiesIndexRouteImport } from './routes/_app/activities/index'
 import { Route as AppAccountsIndexRouteImport } from './routes/_app/accounts/index'
 import { Route as AppLeadsIdRouteImport } from './routes/_app/leads/$id'
+import { Route as AppContactsIdRouteImport } from './routes/_app/contacts/$id'
+import { Route as AppAccountsIdRouteImport } from './routes/_app/accounts/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -93,10 +95,22 @@ const AppLeadsIdRoute = AppLeadsIdRouteImport.update({
   path: '/leads/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppContactsIdRoute = AppContactsIdRouteImport.update({
+  id: '/contacts/$id',
+  path: '/contacts/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAccountsIdRoute = AppAccountsIdRouteImport.update({
+  id: '/accounts/$id',
+  path: '/accounts/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/accounts/$id': typeof AppAccountsIdRoute
+  '/contacts/$id': typeof AppContactsIdRoute
   '/leads/$id': typeof AppLeadsIdRoute
   '/accounts/': typeof AppAccountsIndexRoute
   '/activities/': typeof AppActivitiesIndexRoute
@@ -112,6 +126,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AppIndexRoute
+  '/accounts/$id': typeof AppAccountsIdRoute
+  '/contacts/$id': typeof AppContactsIdRoute
   '/leads/$id': typeof AppLeadsIdRoute
   '/accounts': typeof AppAccountsIndexRoute
   '/activities': typeof AppActivitiesIndexRoute
@@ -129,6 +145,8 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/accounts/$id': typeof AppAccountsIdRoute
+  '/_app/contacts/$id': typeof AppContactsIdRoute
   '/_app/leads/$id': typeof AppLeadsIdRoute
   '/_app/accounts/': typeof AppAccountsIndexRoute
   '/_app/activities/': typeof AppActivitiesIndexRoute
@@ -146,6 +164,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/accounts/$id'
+    | '/contacts/$id'
     | '/leads/$id'
     | '/accounts/'
     | '/activities/'
@@ -161,6 +181,8 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/'
+    | '/accounts/$id'
+    | '/contacts/$id'
     | '/leads/$id'
     | '/accounts'
     | '/activities'
@@ -177,6 +199,8 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/'
+    | '/_app/accounts/$id'
+    | '/_app/contacts/$id'
     | '/_app/leads/$id'
     | '/_app/accounts/'
     | '/_app/activities/'
@@ -295,11 +319,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLeadsIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/contacts/$id': {
+      id: '/_app/contacts/$id'
+      path: '/contacts/$id'
+      fullPath: '/contacts/$id'
+      preLoaderRoute: typeof AppContactsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/accounts/$id': {
+      id: '/_app/accounts/$id'
+      path: '/accounts/$id'
+      fullPath: '/accounts/$id'
+      preLoaderRoute: typeof AppAccountsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppAccountsIdRoute: typeof AppAccountsIdRoute
+  AppContactsIdRoute: typeof AppContactsIdRoute
   AppLeadsIdRoute: typeof AppLeadsIdRoute
   AppAccountsIndexRoute: typeof AppAccountsIndexRoute
   AppActivitiesIndexRoute: typeof AppActivitiesIndexRoute
@@ -315,6 +355,8 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppAccountsIdRoute: AppAccountsIdRoute,
+  AppContactsIdRoute: AppContactsIdRoute,
   AppLeadsIdRoute: AppLeadsIdRoute,
   AppAccountsIndexRoute: AppAccountsIndexRoute,
   AppActivitiesIndexRoute: AppActivitiesIndexRoute,
