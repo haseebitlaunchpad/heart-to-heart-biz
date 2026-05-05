@@ -30,20 +30,32 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Senaei CRM" },
+      {
+        name: "description",
+        content:
+          "Senaei CRM — manage leads, accounts, opportunities, approvals, and handoffs in one place.",
+      },
+      { name: "author", content: "Senaei" },
+      { name: "theme-color", content: "#0F172A" },
+      { property: "og:title", content: "Senaei CRM" },
+      {
+        property: "og:description",
+        content:
+          "Senaei CRM — manage leads, accounts, opportunities, approvals, and handoffs in one place.",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Senaei CRM" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Senaei CRM" },
+      {
+        name: "twitter:description",
+        content: "Manage leads, accounts, opportunities, approvals, and handoffs.",
+      },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,
