@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
-import { Plus, Wrench } from "lucide-react";
+import { Plus, Wrench, LayoutGrid, List as ListIcon } from "lucide-react";
+import { KanbanBoard } from "@/components/KanbanBoard";
 import { useState } from "react";
 import { toast } from "sonner";
 
