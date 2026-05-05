@@ -54,7 +54,7 @@ export async function convertLeadToAccount(leadId: string): Promise<string> {
   const { data: con, error: ce } = await sb.from("contacts").insert(contactPayload).select("id").single();
   if (ce) throw ce;
 
-  const qualifiedStage = await findLookupId("lead_stages", "qualified");
+  const qualifiedStage = await findLookupId("lead_stages", "QUALIFIED");
   await sb.from("leads").update({
     linked_account_id: acc.id,
     linked_contact_id: con.id,
@@ -95,7 +95,7 @@ export async function createMatchFromLead(leadId: string, catalogOpportunityId: 
 /** Submit object for approval. */
 export async function submitForApproval(objectType: string, objectId: string, comments?: string, matchId?: string): Promise<string> {
   const userId = await uid();
-  const pendingId = await findLookupId("approval_statuses", "pending");
+  const pendingId = await findLookupId("approval_statuses", "PENDING");
   const payload: any = {
     related_object_type: objectType,
     related_object_id: objectId,
@@ -122,7 +122,7 @@ export async function submitForApproval(objectType: string, objectId: string, co
 export async function promoteMatchToHandoff(matchId: string, comments?: string): Promise<string> {
   const userId = await uid();
   const { data: m } = await sb.from("opportunity_matches").select("*").eq("id", matchId).single();
-  const draftStatusId = await findLookupId("handoff_statuses", "draft");
+  const draftStatusId = await findLookupId("handoff_statuses", "DRAFT");
   const payload: any = {
     opportunity_match_id: m.id,
     account_id: m.account_id,
@@ -149,7 +149,7 @@ export async function promoteMatchToHandoff(matchId: string, comments?: string):
 /** Decide an approval (approve/reject) and propagate to source. */
 export async function decideApproval(approvalId: string, decision: "approved" | "rejected", reason?: string) {
   const userId = await uid();
-  const statusId = await findLookupId("approval_statuses", decision);
+  const statusId = await findLookupId("approval_statuses", decision === "approved" ? "APPROVED" : "REJECTED");
   const { data: ap } = await sb.from("approvals").select("*").eq("id", approvalId).single();
 
   await sb.from("approvals").update({
