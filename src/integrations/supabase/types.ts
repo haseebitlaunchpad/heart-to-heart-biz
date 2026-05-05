@@ -223,6 +223,51 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action_type: string
+          change_reason: string | null
+          change_source: string | null
+          changed_at: string
+          changed_by: string | null
+          field_name: string | null
+          id: string
+          new_value: Json | null
+          object_id: string
+          object_number: string | null
+          object_type: string
+          old_value: Json | null
+        }
+        Insert: {
+          action_type: string
+          change_reason?: string | null
+          change_source?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          field_name?: string | null
+          id?: string
+          new_value?: Json | null
+          object_id: string
+          object_number?: string | null
+          object_type: string
+          old_value?: Json | null
+        }
+        Update: {
+          action_type?: string
+          change_reason?: string | null
+          change_source?: string | null
+          changed_at?: string
+          changed_by?: string | null
+          field_name?: string | null
+          id?: string
+          new_value?: Json | null
+          object_id?: string
+          object_number?: string | null
+          object_type?: string
+          old_value?: Json | null
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           created_at: string
@@ -363,6 +408,48 @@ export type Database = {
         }
         Relationships: []
       }
+      duplicate_logs: {
+        Row: {
+          decided_at: string
+          decided_by: string | null
+          decision: string | null
+          duplicate_object_id: string
+          duplicate_object_type: string
+          id: string
+          match_confidence: number | null
+          match_field: string | null
+          notes: string | null
+          object_id: string | null
+          object_type: string
+        }
+        Insert: {
+          decided_at?: string
+          decided_by?: string | null
+          decision?: string | null
+          duplicate_object_id: string
+          duplicate_object_type: string
+          id?: string
+          match_confidence?: number | null
+          match_field?: string | null
+          notes?: string | null
+          object_id?: string | null
+          object_type: string
+        }
+        Update: {
+          decided_at?: string
+          decided_by?: string | null
+          decision?: string | null
+          duplicate_object_id?: string
+          duplicate_object_type?: string
+          id?: string
+          match_confidence?: number | null
+          match_field?: string | null
+          notes?: string | null
+          object_id?: string | null
+          object_type?: string
+        }
+        Relationships: []
+      }
       funding_sources: {
         Row: {
           code: string
@@ -456,6 +543,51 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+        }
+        Relationships: []
+      }
+      integration_logs: {
+        Row: {
+          direction: string
+          error_message: string | null
+          id: string
+          integration_name: string
+          related_object_id: string | null
+          related_object_type: string | null
+          request_payload: Json | null
+          response_payload: Json | null
+          retry_count: number
+          status: string | null
+          triggered_at: string
+          triggered_by: string | null
+        }
+        Insert: {
+          direction: string
+          error_message?: string | null
+          id?: string
+          integration_name: string
+          related_object_id?: string | null
+          related_object_type?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          retry_count?: number
+          status?: string | null
+          triggered_at?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          direction?: string
+          error_message?: string | null
+          id?: string
+          integration_name?: string
+          related_object_id?: string | null
+          related_object_type?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          retry_count?: number
+          status?: string | null
+          triggered_at?: string
+          triggered_by?: string | null
         }
         Relationships: []
       }
@@ -956,6 +1088,45 @@ export type Database = {
         }
         Relationships: []
       }
+      security_logs: {
+        Row: {
+          details: Json | null
+          event_at: string
+          event_type: string
+          id: string
+          ip_address: string | null
+          module_name: string | null
+          object_id: string | null
+          object_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          details?: Json | null
+          event_at?: string
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          module_name?: string | null
+          object_id?: string | null
+          object_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          details?: Json | null
+          event_at?: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          module_name?: string | null
+          object_id?: string | null
+          object_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sub_sectors: {
         Row: {
           code: string
@@ -1285,6 +1456,45 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+        }
+        Relationships: []
+      }
+      workflow_logs: {
+        Row: {
+          action_taken: string
+          comments: string | null
+          from_status: string | null
+          id: string
+          object_id: string
+          object_type: string
+          performed_at: string
+          performed_by: string | null
+          process_name: string
+          to_status: string | null
+        }
+        Insert: {
+          action_taken: string
+          comments?: string | null
+          from_status?: string | null
+          id?: string
+          object_id: string
+          object_type: string
+          performed_at?: string
+          performed_by?: string | null
+          process_name: string
+          to_status?: string | null
+        }
+        Update: {
+          action_taken?: string
+          comments?: string | null
+          from_status?: string | null
+          id?: string
+          object_id?: string
+          object_type?: string
+          performed_at?: string
+          performed_by?: string | null
+          process_name?: string
+          to_status?: string | null
         }
         Relationships: []
       }
