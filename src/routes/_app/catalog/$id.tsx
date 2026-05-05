@@ -10,6 +10,9 @@ import { Label } from "@/components/ui/label";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab } from "@/components/RelatedTabs";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,8 +25,7 @@ function CatalogDetail() {
     queryKey: ["catalog", id],
     queryFn: async () => (await supabase.from("opportunity_catalog").select("*").eq("id", id).maybeSingle()).data,
   });
-  const { data: statuses = [] } = useLookup("opportunity_statuses").data ? { data: [] } as any : useLookup("match_statuses");
-  // statuses lookup table may not exist; just use string state below.
+  useLookup("match_statuses");
   const update = useMutation({
     mutationFn: async (patch: any) => {
       const { error } = await (supabase as any).from("opportunity_catalog").update(patch).eq("id", id);
@@ -52,6 +54,7 @@ function CatalogDetail() {
         <Button size="sm" onClick={() => setStatus("published")}>Publish</Button>
         <Button size="sm" variant="outline" onClick={() => setStatus("suspended")}>Suspend</Button>
         <Button size="sm" variant="destructive" onClick={() => setStatus("archived")}>Archive</Button>
+        <DeleteRecordButton table="opportunity_catalog" recordId={id} recordNumber={c.record_number} redirectTo="/catalog" />
       </>}
       summary={<>
         <SummaryField label="Type" value={c.journey_area} />
@@ -62,7 +65,7 @@ function CatalogDetail() {
         <SummaryField label="Expires" value={c.expiry_date} />
       </>}
       tabs={[
-        { key: "general", label: "General", render: () => <General c={c} update={update.mutateAsync} /> },
+        { key: "general", label: "General", render: () => <RecordEditor table="opportunity_catalog" recordId={id} record={c} sections={schemas.opportunity_catalog} queryKey={["catalog", id]} /> },
         { key: "eligibility", label: "Eligibility", render: () => (
           <div className="space-y-2 text-sm">
             <div><b>Required CR:</b> {c.required_cr ? "Yes" : "No"}</div>
