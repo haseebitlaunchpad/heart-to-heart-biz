@@ -126,6 +126,12 @@ function LeadsList() {
             <option value="">All temperatures</option>
             {(temps as any[]).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          <label className="flex items-center gap-1.5 text-xs px-2 h-9 border rounded bg-background cursor-pointer">
+            <input type="checkbox" checked={ownerMe} onChange={(e) => setOwnerMe(e.target.checked)} /> Mine
+          </label>
+          <label className="flex items-center gap-1.5 text-xs px-2 h-9 border rounded bg-background cursor-pointer">
+            <input type="checkbox" checked={openOnly} onChange={(e) => setOpenOnly(e.target.checked)} /> Open only
+          </label>
         </FilterBar>
         {view === "list" ? (
           <div className="bg-card border rounded-lg">
