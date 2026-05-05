@@ -30,6 +30,8 @@ function LeadDetail() {
   const [disqOpen, setDisqOpen] = useState(false);
   const [disqReasonId, setDisqReasonId] = useState("");
   const [disqNote, setDisqNote] = useState("");
+  const [matchOpen, setMatchOpen] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
 
   const { data: lead, isLoading } = useQuery({
     queryKey: ["lead", id],
