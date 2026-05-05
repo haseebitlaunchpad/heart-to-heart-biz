@@ -73,9 +73,12 @@ function LeadsList() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const openStatusId = (statuses as any[]).find((s) => s.code === "OPEN")?.id;
   const filtered = (rows as any[]).filter((r) => {
     if (stageFilter && r.lead_stage_id !== stageFilter) return false;
     if (tempFilter && r.qualification_temperature_id !== tempFilter) return false;
+    if (ownerMe && user?.id && r.owner_id !== user.id) return false;
+    if (openOnly && openStatusId && r.lead_status_id !== openStatusId) return false;
     if (search && !`${r.lead_name} ${r.company_name ?? ""} ${r.email ?? ""} ${r.record_number ?? ""}`.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
