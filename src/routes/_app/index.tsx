@@ -13,14 +13,47 @@ export const Route = createFileRoute("/_app/")({ component: Dashboard });
 
 const PIE_COLORS = ["hsl(var(--primary))", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#06b6d4", "#84cc16"];
 
-function KpiTile({ label, value, hint, to }: { label: string; value: number | string; hint?: string; to: string }) {
+function KpiTile({ label, value, hint, to, accent, icon: Icon }: { label: string; value: number | string; hint?: string; to: string; accent?: string; icon?: any }) {
   return (
-    <Link to={to as any} className="block bg-card border rounded-lg p-4 hover:border-primary hover:shadow-sm transition group">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+    <Link to={to as any} className="block bg-card border rounded-lg p-4 hover:border-primary hover:shadow-sm transition group relative overflow-hidden">
+      {accent && <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: accent }} />}
+      <div className="flex items-center justify-between">
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+        {Icon && <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition" />}
+      </div>
       <div className="text-3xl font-semibold mt-1 group-hover:text-primary transition">{value}</div>
       {hint && <div className="text-xs text-muted-foreground mt-1">{hint}</div>}
     </Link>
   );
+}
+
+function useMyOpenLeads(uid?: string) {
+  return useQuery({
+    queryKey: ["my-open-leads", uid], enabled: !!uid,
+    queryFn: async () => {
+      const { count } = await (supabase as any).from("leads").select("*", { count: "exact", head: true }).eq("owner_id", uid).eq("is_archived", false);
+      return count ?? 0;
+    },
+  });
+}
+function usePendingApprovals() {
+  return useQuery({ queryKey: ["pending-approvals"], queryFn: async () => {
+    const { count } = await (supabase as any).from("approvals").select("*", { count: "exact", head: true }).is("decision", null);
+    return count ?? 0;
+  }});
+}
+function useOverdueActivities() {
+  return useQuery({ queryKey: ["overdue-activities"], queryFn: async () => {
+    const nowIso = new Date().toISOString();
+    const { count } = await (supabase as any).from("activities").select("*", { count: "exact", head: true }).is("completed_at", null).lt("due_date", nowIso);
+    return count ?? 0;
+  }});
+}
+function useMyOpenTasks(uid?: string) {
+  return useQuery({
+    queryKey: ["my-open-tasks", uid], enabled: !!uid,
+    queryFn: async () => (await (supabase as any).from("activities").select("id, record_number, subject, due_date, related_object_type, related_object_id").eq("owner_id", uid).is("completed_at", null).order("due_date", { ascending: true, nullsFirst: false }).limit(6)).data ?? [],
+  });
 }
 
 function useCount(table: string) {
