@@ -13,9 +13,12 @@ import { useLookup, lookupName } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/RelatedTabs";
 import { ActivityDrawer } from "@/components/ActivityDrawer";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertTriangle, Repeat2, UserPlus, Plus, Target, Send } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Plus, Target, Send } from "lucide-react";
 import { createMatchFromLead, submitForApproval } from "@/lib/conversions";
 
 export const Route = createFileRoute("/_app/leads/$id")({ component: LeadDetail });
