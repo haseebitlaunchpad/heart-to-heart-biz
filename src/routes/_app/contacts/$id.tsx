@@ -61,7 +61,7 @@ function ContactDetail() {
         ]}
       />
       <ActivityDrawer open={actDrawer} onOpenChange={setActDrawer} relatedType="contact" relatedId={id} defaultSubject={`Contact: ${c.full_name}`} />
-      <AddSiblingDialog open={siblingOpen} onOpenChange={setSiblingOpen} accountId={c.account_id} onCreated={(newId) => nav({ to: `/contacts/${newId}` as any })} />
+      {c.account_id && <AddSiblingDialog open={siblingOpen} onOpenChange={setSiblingOpen} accountId={c.account_id} onCreated={(newId) => nav({ to: `/contacts/${newId}` as any })} />}
     </>
   );
 }
