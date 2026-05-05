@@ -81,6 +81,10 @@ function MatchesList() {
     <>
       <PageHeader title="Opportunity Matches" subtitle="Lead/Account ↔ Catalog matches" actions={
         <>
+          <div className="flex border rounded-md p-0.5">
+            <Button size="sm" variant={view === "list" ? "secondary" : "ghost"} onClick={() => setView("list")}><ListIcon className="h-4 w-4" /></Button>
+            <Button size="sm" variant={view === "board" ? "secondary" : "ghost"} onClick={() => setView("board")}><LayoutGrid className="h-4 w-4" /></Button>
+          </div>
           <Button asChild variant="outline" size="sm"><Link to="/matches/workbench"><Wrench className="h-4 w-4 mr-1" />Workbench</Link></Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild><Button><Plus className="h-4 w-4 mr-1" />New Match</Button></DialogTrigger>
