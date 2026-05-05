@@ -12,9 +12,13 @@ import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/RelatedTabs";
 import { ActivityDrawer } from "@/components/ActivityDrawer";
+import { RecordEditor } from "@/components/RecordEditor";
+import { schemas } from "@/lib/recordSchemas";
+import { DeleteRecordButton } from "@/components/DeleteRecordButton";
+import { setPrimaryContact } from "@/lib/conversions";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Crown } from "lucide-react";
+import { Plus, Crown, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_app/accounts/$id")({ component: AccountDetail });
 
@@ -65,6 +69,7 @@ function AccountDetail() {
         actions={<>
           <Button size="sm" variant="outline" onClick={() => setActDrawer(true)}><Plus className="h-4 w-4 mr-1" />Log Activity</Button>
           {!isInvestor && <Button size="sm" onClick={promote}><Crown className="h-4 w-4 mr-1" />Promote to Investor</Button>}
+          <DeleteRecordButton table="accounts" recordId={id} recordNumber={account.record_number} redirectTo="/accounts" />
         </>}
         summary={<>
           <SummaryField label="Email" value={account.primary_email} />
@@ -74,8 +79,8 @@ function AccountDetail() {
           <SummaryField label="Created" value={new Date(account.created_at).toLocaleString()} />
         </>}
         tabs={[
-          { key: "overview", label: "Overview", render: () => <Editable account={account} update={update.mutateAsync} /> },
-          { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "email", "mobile"]} linkBase="/contacts" addLabel="Add Contact" addFields={[{key:"full_name",label:"Full name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
+          { key: "overview", label: "Overview", render: () => <RecordEditor table="accounts" recordId={id} record={account} sections={schemas.accounts} queryKey={["account", id]} /> },
+          { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "job_title", "email", "mobile", "is_primary_contact"]} linkBase="/contacts" addLabel="Add Contact" addFields={[{key:"full_name",label:"Full name",required:true},{key:"job_title",label:"Job title"},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} primaryAction /> },
           { key: "leads", label: "Leads", render: () => <RelatedList table="leads" filter={{ linked_account_id: id }} columns={["record_number", "lead_name", "email", "mobile"]} linkBase="/leads" addLabel="New Lead" addFields={[{key:"lead_name",label:"Lead name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
           { key: "matches", label: "Matches", render: () => <MatchesRelated accountId={id} /> },
           { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
