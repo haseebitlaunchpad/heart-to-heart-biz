@@ -29,7 +29,7 @@ function ActivitiesPage() {
   const items = filtered.map((r: any) => ({
     id: r.id,
     title: <>
-      <span>{r.subject}</span>
+      <Link to={`/activities/${r.id}` as any} className="hover:text-primary">{r.subject}</Link>
       {r.related_object_id && r.related_object_type === "lead" && <Link to={`/leads/${r.related_object_id}` as any} className="ml-2 text-xs text-primary">→ Lead</Link>}
       {r.related_object_id && r.related_object_type === "account" && <Link to={`/accounts/${r.related_object_id}` as any} className="ml-2 text-xs text-primary">→ Account</Link>}
       {r.related_object_id && r.related_object_type === "contact" && <Link to={`/contacts/${r.related_object_id}` as any} className="ml-2 text-xs text-primary">→ Contact</Link>}
