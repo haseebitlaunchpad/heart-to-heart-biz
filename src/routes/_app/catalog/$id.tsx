@@ -4,9 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { DetailLayout, SummaryField } from "@/components/DetailLayout";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useLookup } from "@/lib/lookups";
 import { writeWorkflowLog } from "@/lib/logs";
 import { ChangesTab, WorkflowTab } from "@/components/RelatedTabs";
@@ -91,19 +88,6 @@ function CatalogDetail() {
   );
 }
 
-function General({ c, update }: { c: any; update: (p: any) => Promise<any> }) {
-  const [f, setF] = useState({ title: c.title, description: c.description ?? "", min_investment: c.min_investment ?? "", max_investment: c.max_investment ?? "", capacity: c.capacity ?? "" });
-  return (
-    <div className="grid md:grid-cols-2 gap-3 max-w-3xl">
-      <div className="md:col-span-2"><Label>Title</Label><Input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
-      <div className="md:col-span-2"><Label>Description</Label><Textarea rows={4} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></div>
-      <div><Label>Min investment</Label><Input value={f.min_investment} onChange={(e) => setF({ ...f, min_investment: e.target.value })} /></div>
-      <div><Label>Max investment</Label><Input value={f.max_investment} onChange={(e) => setF({ ...f, max_investment: e.target.value })} /></div>
-      <div><Label>Capacity</Label><Input value={f.capacity} onChange={(e) => setF({ ...f, capacity: e.target.value })} /></div>
-      <div className="md:col-span-2"><Button onClick={async () => { await update({ ...f, min_investment: f.min_investment || null, max_investment: f.max_investment || null, capacity: f.capacity || null }); toast.success("Saved"); }}>Save</Button></div>
-    </div>
-  );
-}
 
 function Matches({ catalogId }: { catalogId: string }) {
   const { data = [] } = useQuery({ queryKey: ["catalog-matches", catalogId], queryFn: async () => (await supabase.from("opportunity_matches").select("*").eq("catalog_opportunity_id", catalogId).limit(50)).data ?? [] });
