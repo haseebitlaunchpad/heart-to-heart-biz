@@ -87,6 +87,8 @@ function useGroupCount(table: string, fkColumn: string, lookupTable: string, lab
 }
 
 function Dashboard() {
+  const { user } = useAuth();
+  const uid = user?.id;
   const leads = useCount("leads");
   const accounts = useCount("accounts");
   const contacts = useCount("contacts");
@@ -95,22 +97,70 @@ function Dashboard() {
   const handoffs = useCount("handoffs");
   const activities = useCount("activities");
 
+  const myLeads = useMyOpenLeads(uid);
+  const pendingApprovals = usePendingApprovals();
+  const overdue = useOverdueActivities();
+  const myTasks = useMyOpenTasks(uid);
+
   const funnel = useGroupCount("leads", "lead_stage_id", "lead_stages");
   const matchStatus = useGroupCount("opportunity_matches", "match_status_id", "match_statuses");
   const handoffStatus = useGroupCount("handoffs", "handoff_status_id", "handoff_statuses");
 
+  const greetingHour = new Date().getHours();
+  const greet = greetingHour < 12 ? "Good morning" : greetingHour < 18 ? "Good afternoon" : "Good evening";
+  const name = (user?.user_metadata as any)?.full_name ?? user?.email?.split("@")[0] ?? "there";
+
   return (
     <>
-      <PageHeader title="CRM Dashboard" subtitle="Senaei Investor Journey — Phase 1" />
+      <PageHeader title="CRM Dashboard" subtitle={`${greet}, ${name} · ${new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}`} />
       <div className="p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-          <KpiTile to="/leads" label="Leads" value={leads.data ?? "…"} />
-          <KpiTile to="/accounts" label="Accounts" value={accounts.data ?? "…"} />
-          <KpiTile to="/contacts" label="Contacts" value={contacts.data ?? "…"} />
-          <KpiTile to="/catalog" label="Catalog" value={catalog.data ?? "…"} />
-          <KpiTile to="/matches" label="Matches" value={matches.data ?? "…"} />
-          <KpiTile to="/handoffs" label="Handoffs" value={handoffs.data ?? "…"} />
-          <KpiTile to="/activities" label="Activities" value={activities.data ?? "…"} />
+        <div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">My work</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <KpiTile to="/leads?owner=me&open=1" label="My open leads" value={myLeads.data ?? "…"} icon={Inbox} accent="hsl(var(--primary))" />
+            <KpiTile to="/approvals?status=pending" label="Pending approvals" value={pendingApprovals.data ?? "…"} icon={ClipboardCheck} accent="#f59e0b" />
+            <KpiTile to="/activities?overdue=1" label="Overdue activities" value={overdue.data ?? "…"} icon={AlertTriangle} accent="#ef4444" />
+            <KpiTile to="/matches?status=proposed" label="Hot matches" value={matches.data ?? "…"} icon={Flame} accent="#10b981" />
+          </div>
+        </div>
+
+        <div>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">All records</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+            <KpiTile to="/leads" label="Leads" value={leads.data ?? "…"} />
+            <KpiTile to="/accounts" label="Accounts" value={accounts.data ?? "…"} />
+            <KpiTile to="/contacts" label="Contacts" value={contacts.data ?? "…"} />
+            <KpiTile to="/catalog" label="Catalog" value={catalog.data ?? "…"} />
+            <KpiTile to="/matches" label="Matches" value={matches.data ?? "…"} />
+            <KpiTile to="/handoffs" label="Handoffs" value={handoffs.data ?? "…"} />
+            <KpiTile to="/activities" label="Activities" value={activities.data ?? "…"} />
+          </div>
+        </div>
+
+        <div className="bg-card border rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm font-medium">My open tasks</div>
+            <Link to="/activities" className="text-xs text-primary hover:underline">View all</Link>
+          </div>
+          {(myTasks.data ?? []).length === 0 ? (
+            <div className="text-sm text-muted-foreground py-4 text-center">No open tasks 🎉</div>
+          ) : (
+            <ul className="divide-y">
+              {(myTasks.data as any[]).map((t) => {
+                const overdueT = t.due_date && new Date(t.due_date) < new Date();
+                return (
+                  <li key={t.id} className="py-2 flex items-center justify-between text-sm">
+                    <Link to={`/activities/${t.id}` as any} className="hover:text-primary truncate">
+                      <span className="text-muted-foreground text-xs mr-2">{t.record_number}</span>{t.subject}
+                    </Link>
+                    <span className={`text-xs ${overdueT ? "text-destructive" : "text-muted-foreground"}`}>
+                      {t.due_date ? new Date(t.due_date).toLocaleDateString() : "No due"}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
