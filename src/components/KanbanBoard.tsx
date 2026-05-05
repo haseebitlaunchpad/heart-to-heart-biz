@@ -5,6 +5,7 @@ import {
   useDraggable, useDroppable, DragOverlay,
 } from "@dnd-kit/core";
 import { useState } from "react";
+import { GripVertical } from "lucide-react";
 
 export type KanbanCol = { id: string; title: string; color?: string | null };
 export type KanbanCard = { id: string; columnId: string; title: string; subtitle?: string; meta?: string };
@@ -56,7 +57,7 @@ function Column({ col, cards, linkBase, canDrop }: { col: KanbanCol; cards: Kanb
       </div>
       <div ref={setNodeRef} className={`p-2 space-y-2 max-h-[70vh] overflow-y-auto min-h-[80px] transition ${isOver ? "bg-primary/5 outline outline-primary/40 outline-2 -outline-offset-2 rounded" : ""}`}>
         {cards.map((card) => (
-          <DraggableCard key={card.id} card={card} linkBase={linkBase} canDrag={canDrop} />
+          <KanbanRow key={card.id} card={card} linkBase={linkBase} canDrag={canDrop} />
         ))}
         {!cards.length && <div className="text-xs text-muted-foreground italic px-2 py-3">Empty</div>}
       </div>
@@ -64,20 +65,31 @@ function Column({ col, cards, linkBase, canDrop }: { col: KanbanCol; cards: Kanb
   );
 }
 
-function DraggableCard({ card, linkBase, canDrag }: { card: KanbanCard; linkBase: string; canDrag: boolean }) {
+function KanbanRow({ card, linkBase, canDrag }: { card: KanbanCard; linkBase: string; canDrag: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: card.id, disabled: !canDrag });
   return (
-    <div ref={setNodeRef} {...attributes} {...listeners} style={{ opacity: isDragging ? 0.4 : 1 }}>
+    <div ref={setNodeRef} className="relative" style={{ opacity: isDragging ? 0.4 : 1 }}>
       <Link to={`${linkBase}/${card.id}` as any} className="block">
-        <CardShell card={card} />
+        <CardShell card={card} withHandle={canDrag} />
       </Link>
+      {canDrag && (
+        <button
+          {...attributes}
+          {...listeners}
+          aria-label="Drag"
+          onClick={(e) => e.preventDefault()}
+          className="absolute top-1.5 right-1.5 p-1 rounded hover:bg-muted text-muted-foreground cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+      )}
     </div>
   );
 }
 
-function CardShell({ card, dragging }: { card: KanbanCard; dragging?: boolean }): ReactNode {
+function CardShell({ card, dragging, withHandle }: { card: KanbanCard; dragging?: boolean; withHandle?: boolean }): ReactNode {
   return (
-    <div className={`bg-card border rounded p-2 text-sm hover:border-primary transition ${dragging ? "shadow-lg ring-2 ring-primary/30" : ""}`}>
+    <div className={`bg-card border rounded p-2 text-sm hover:border-primary transition ${dragging ? "shadow-lg ring-2 ring-primary/30" : ""} ${withHandle ? "pr-7" : ""}`}>
       <div className="font-medium truncate">{card.title}</div>
       {card.subtitle && <div className="text-xs text-muted-foreground truncate">{card.subtitle}</div>}
       {card.meta && <div className="text-xs text-muted-foreground mt-1">{card.meta}</div>}
