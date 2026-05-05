@@ -131,11 +131,12 @@ function MatchesList() {
         </>
       } />
       <div className="p-4">
-        <FilterBar search={search} onSearch={setSearch}>
+        <FilterBar>
           <select className="h-9 border rounded px-2 text-sm bg-background" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="">All statuses</option>
             {(statuses as any[]).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          <span className="text-xs text-muted-foreground ml-2">Tip: use ⌘K to search across the whole CRM.</span>
         </FilterBar>
         {view === "list" ? (
           <div className="bg-card border rounded-lg">
