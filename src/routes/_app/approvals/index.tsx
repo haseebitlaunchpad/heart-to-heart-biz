@@ -47,6 +47,7 @@ function ApprovalsList() {
 
   const filtered = (rows as any[]).filter((r) => {
     if (statusFilter && r.approval_status_id !== statusFilter) return false;
+    if (pendingOnly && r.decision) return false;
     if (search && !`${r.record_number ?? ""} ${r.related_object_type ?? ""} ${r.comments ?? ""}`.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -60,6 +61,9 @@ function ApprovalsList() {
             <option value="">All statuses</option>
             {(statuses as any[]).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          <label className="flex items-center gap-1.5 text-xs px-2 h-9 border rounded bg-background cursor-pointer">
+            <input type="checkbox" checked={pendingOnly} onChange={(e) => setPendingOnly(e.target.checked)} /> Pending only
+          </label>
         </FilterBar>
         <div className="bg-card border rounded-lg">
           {isLoading ? <div className="p-8 text-center text-muted-foreground">Loading…</div> :
