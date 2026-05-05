@@ -100,6 +100,8 @@ function LeadDetail() {
           <>
             <Button size="sm" variant="outline" onClick={() => setActDrawer(true)}><Plus className="h-4 w-4 mr-1" />Log Activity</Button>
             <Button size="sm" variant="outline" onClick={() => setIdentifyOpen(true)}><AlertTriangle className="h-4 w-4 mr-1" />Identify</Button>
+            <Button size="sm" variant="outline" onClick={() => setMatchOpen(true)}><Target className="h-4 w-4 mr-1" />Create Match</Button>
+            <Button size="sm" variant="outline" onClick={() => setSubmitOpen(true)}><Send className="h-4 w-4 mr-1" />Submit Approval</Button>
             <Button size="sm" variant="outline" onClick={() => setDisqOpen(true)}>Disqualify</Button>
             <Button size="sm" onClick={() => setConvertOpen(true)}><CheckCircle2 className="h-4 w-4 mr-1" />Convert</Button>
           </>
