@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Timeline, TimelineItem } from "@/components/Timeline";
+import { RecordRef } from "@/components/RecordRef";
+import { FK_TABLE_MAP, isUuid } from "@/lib/recordRefs";
 
 export function ChangesTab({ objectType, objectId }: { objectType: string; objectId: string }) {
   const { data = [] } = useQuery({
@@ -39,17 +41,29 @@ function DiffView({ old: prev, next }: { old: any; next: any }) {
   });
   if (!diffs.length) return null;
   return (
-    <div className="text-xs space-y-1 font-mono">
+    <div className="text-xs space-y-1">
       {diffs.slice(0, 8).map((d) => (
         <div key={d.k}>
           <span className="text-muted-foreground">{d.k}:</span>{" "}
-          <span className="line-through opacity-60">{stringify(d.a)}</span> →{" "}
-          <span>{stringify(d.b)}</span>
+          <span className="opacity-60 line-through">{renderVal(d.k, d.a)}</span>
+          {" → "}
+          <span>{renderVal(d.k, d.b)}</span>
         </div>
       ))}
       {diffs.length > 8 && <div className="text-muted-foreground">+ {diffs.length - 8} more</div>}
     </div>
   );
+}
+
+function renderVal(field: string, v: any) {
+  if (v === null || v === undefined || v === "") return <span className="font-mono">—</span>;
+  if (isUuid(v)) {
+    const table = FK_TABLE_MAP[field];
+    if (table) return <RecordRef table={table} id={v} />;
+    return <span className="font-mono text-xs">{v.slice(0, 8)}…</span>;
+  }
+  if (typeof v === "string") return <span>{v.length > 60 ? v.slice(0, 60) + "…" : v}</span>;
+  return <span className="font-mono text-xs">{JSON.stringify(v)}</span>;
 }
 
 function stringify(v: any) {
