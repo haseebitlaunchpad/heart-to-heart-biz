@@ -25,13 +25,19 @@ export function ActivityDrawer({
   const [statusId, setStatusId] = useState<string>("");
   const [outcomeId, setOutcomeId] = useState<string>("");
   const [dueDate, setDueDate] = useState<string>("");
+  const [ownerId, setOwnerId] = useState<string>("");
 
   const { data: types = [] } = useQuery({ queryKey: ["activity_types"], queryFn: async () => (await supabase.from("activity_types").select("*").eq("is_active", true)).data ?? [] });
   const { data: statuses = [] } = useQuery({ queryKey: ["activity_statuses"], queryFn: async () => (await supabase.from("activity_statuses").select("*").eq("is_active", true)).data ?? [] });
   const { data: outcomes = [] } = useQuery({ queryKey: ["activity_outcomes"], queryFn: async () => (await supabase.from("activity_outcomes").select("*").eq("is_active", true)).data ?? [] });
+  const { data: users = [] } = useQuery({ queryKey: ["user_profiles_lite"], queryFn: async () => (await supabase.from("user_profiles").select("id, full_name, email").order("full_name")).data ?? [] });
 
   useEffect(() => {
     if (open) {
+      (async () => {
+        const { data: u } = await supabase.auth.getUser();
+        setOwnerId(u.user?.id ?? "");
+      })();
       setSubject(defaultSubject ?? "");
       setDescription(""); setOutcomeId(""); setDueDate("");
       setTypeId((types[0] as any)?.id ?? "");
