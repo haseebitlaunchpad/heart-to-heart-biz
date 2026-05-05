@@ -116,20 +116,25 @@ function LeadsList() {
               <DataTable
                 rows={filtered as any}
                 linkBase="/leads"
+                groupableKeys={["stage", "temp"]}
                 columns={[
                   { key: "record_number", header: "ID" },
                   { key: "lead_name", header: "Name" },
                   { key: "company_name", header: "Company" },
                   { key: "email", header: "Email" },
-                  { key: "mobile", header: "Mobile" },
-                  { key: "stage", header: "Stage", render: (r: any) => {
-                    const s = (stages as any[]).find((x) => x.id === r.lead_stage_id);
-                    return <StatusBadge label={s?.name} color={s?.color} />;
-                  } },
-                  { key: "temp", header: "Temp", render: (r: any) => {
-                    const s = (temps as any[]).find((x) => x.id === r.qualification_temperature_id);
-                    return <StatusBadge label={s?.name} color={s?.color} />;
-                  } },
+                  { key: "mobile", header: "Mobile", sortable: false },
+                  { key: "stage", header: "Stage",
+                    value: (r: any) => (stages as any[]).find((x) => x.id === r.lead_stage_id)?.name ?? "—",
+                    render: (r: any) => {
+                      const s = (stages as any[]).find((x) => x.id === r.lead_stage_id);
+                      return <StatusBadge label={s?.name} color={s?.color} />;
+                    } },
+                  { key: "temp", header: "Temp",
+                    value: (r: any) => (temps as any[]).find((x) => x.id === r.qualification_temperature_id)?.name ?? "—",
+                    render: (r: any) => {
+                      const s = (temps as any[]).find((x) => x.id === r.qualification_temperature_id);
+                      return <StatusBadge label={s?.name} color={s?.color} />;
+                    } },
                   { key: "lead_score", header: "Score" },
                 ]}
               />
