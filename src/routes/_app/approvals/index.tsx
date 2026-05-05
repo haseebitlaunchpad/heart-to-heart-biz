@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useLookup } from "@/lib/lookups";
-import { writeWorkflowLog } from "@/lib/logs";
+import { decideApproval } from "@/lib/conversions";
 import { Check, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
