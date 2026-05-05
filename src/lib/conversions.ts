@@ -146,6 +146,16 @@ export async function promoteMatchToHandoff(matchId: string, comments?: string):
   return data.id as string;
 }
 
+/** Set a contact as primary; demote any other primary contact on the same account. */
+export async function setPrimaryContact(contactId: string): Promise<void> {
+  const { data: c } = await sb.from("contacts").select("id, account_id").eq("id", contactId).single();
+  if (c?.account_id) {
+    await sb.from("contacts").update({ is_primary_contact: false }).eq("account_id", c.account_id).neq("id", contactId);
+  }
+  await sb.from("contacts").update({ is_primary_contact: true }).eq("id", contactId);
+  await writeWorkflowLog({ process: "contact_set_primary", objectType: "contacts", objectId: contactId, action: "set_primary" });
+}
+
 /** Decide an approval (approve/reject) and propagate to source. */
 export async function decideApproval(approvalId: string, decision: "approved" | "rejected", reason?: string) {
   const userId = await uid();
