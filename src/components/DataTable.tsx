@@ -66,12 +66,12 @@ export function DataTable<T extends { id: string }>({
           </select>
         </div>
       )}
-      <div className="overflow-auto">
+      <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-muted/60 text-xs uppercase text-muted-foreground">
             <tr>
               {columns.map((c) => (
-                <th key={c.key} className="text-left px-3 py-2 font-medium select-none">
+                <th key={c.key} className="text-left px-3 py-2 font-medium select-none whitespace-nowrap">
                   {c.sortable !== false ? (
                     <button onClick={() => toggleSort(c.key)} className="inline-flex items-center gap-1 hover:text-foreground">
                       {c.header}
