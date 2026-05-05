@@ -20,7 +20,7 @@ function LookupSelect({ table, orderBy, value, onChange }: { table: string; orde
       disabled={isLoading}
       onChange={(e) => onChange(e.target.value || null)}>
       <option value="">— none —</option>
-      {(data as any[]).map((r) => <option key={r.id} value={r.id}>{r.name ?? r.code ?? r.id}</option>)}
+      {(data as any[]).map((r) => <option key={r.id} value={r.id}>{r.name ?? r.full_name ?? r.email ?? r.code ?? r.id}</option>)}
     </select>
   );
 }
