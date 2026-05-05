@@ -22,6 +22,7 @@ import { Route as AppApprovalsIndexRouteImport } from './routes/_app/approvals/i
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin/index'
 import { Route as AppActivitiesIndexRouteImport } from './routes/_app/activities/index'
 import { Route as AppAccountsIndexRouteImport } from './routes/_app/accounts/index'
+import { Route as AppLeadsIdRouteImport } from './routes/_app/leads/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -87,10 +88,16 @@ const AppAccountsIndexRoute = AppAccountsIndexRouteImport.update({
   path: '/accounts/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLeadsIdRoute = AppLeadsIdRouteImport.update({
+  id: '/leads/$id',
+  path: '/leads/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/leads/$id': typeof AppLeadsIdRoute
   '/accounts/': typeof AppAccountsIndexRoute
   '/activities/': typeof AppActivitiesIndexRoute
   '/admin/': typeof AppAdminIndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AppIndexRoute
+  '/leads/$id': typeof AppLeadsIdRoute
   '/accounts': typeof AppAccountsIndexRoute
   '/activities': typeof AppActivitiesIndexRoute
   '/admin': typeof AppAdminIndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/leads/$id': typeof AppLeadsIdRoute
   '/_app/accounts/': typeof AppAccountsIndexRoute
   '/_app/activities/': typeof AppActivitiesIndexRoute
   '/_app/admin/': typeof AppAdminIndexRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/leads/$id'
     | '/accounts/'
     | '/activities/'
     | '/admin/'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/'
+    | '/leads/$id'
     | '/accounts'
     | '/activities'
     | '/admin'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/'
+    | '/_app/leads/$id'
     | '/_app/accounts/'
     | '/_app/activities/'
     | '/_app/admin/'
@@ -276,11 +288,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/leads/$id': {
+      id: '/_app/leads/$id'
+      path: '/leads/$id'
+      fullPath: '/leads/$id'
+      preLoaderRoute: typeof AppLeadsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppLeadsIdRoute: typeof AppLeadsIdRoute
   AppAccountsIndexRoute: typeof AppAccountsIndexRoute
   AppActivitiesIndexRoute: typeof AppActivitiesIndexRoute
   AppAdminIndexRoute: typeof AppAdminIndexRoute
@@ -295,6 +315,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppLeadsIdRoute: AppLeadsIdRoute,
   AppAccountsIndexRoute: AppAccountsIndexRoute,
   AppActivitiesIndexRoute: AppActivitiesIndexRoute,
   AppAdminIndexRoute: AppAdminIndexRoute,
