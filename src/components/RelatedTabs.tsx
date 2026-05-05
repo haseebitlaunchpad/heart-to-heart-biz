@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Timeline, TimelineItem } from "@/components/Timeline";
+import { RecordRef } from "@/components/RecordRef";
+import { FK_TABLE_MAP, isUuid } from "@/lib/recordRefs";
 
 export function ChangesTab({ objectType, objectId }: { objectType: string; objectId: string }) {
   const { data = [] } = useQuery({
