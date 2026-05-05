@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_app/matches/$id")({ component: MatchDeta
 function MatchDetail() {
   const { id } = useParams({ from: "/_app/matches/$id" });
   const qc = useQueryClient();
+  const nav = useNavigate();
   const { data: m, isLoading } = useQuery({
     queryKey: ["match", id],
     queryFn: async () => (await supabase.from("opportunity_matches").select("*, opportunity_catalog(*), leads(id,lead_name), accounts(id,account_name)").eq("id", id).maybeSingle()).data,
