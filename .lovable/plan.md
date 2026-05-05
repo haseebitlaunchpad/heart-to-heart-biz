@@ -1,27 +1,25 @@
-# Add Breadcrumbs Across the Portal
+# Fix live /logs 404
 
-A single `Breadcrumbs` component derives its trail from the current URL and is rendered inside the two header surfaces every page already uses. No per-page changes required.
+## What I found
+- The live published URLs `https://heart-to-heart-biz.lovable.app/logs` and `https://teraiq.shop/logs` both still return the app’s own 404 page.
+- The logs page file does exist at `src/routes/_app/logs/index.tsx`.
+- That route is currently declared as `createFileRoute("/_app/logs/")`, which generates a route whose full path is `/logs/`.
+- The navigation links in the app point to `/logs` without the trailing slash.
+- Other index routes in the app also use the trailing-slash declaration style, so the routing behavior is inconsistent with how the live app is being accessed and published.
 
-## New file
+## Plan
+1. Update the logs page route declaration so it matches the intended public URL consistently, using the same canonical no-trailing-slash path the app links to.
+2. Review shared navigation and breadcrumb usage around Logs to ensure every internal link targets the same canonical route and does not rely on slash normalization.
+3. Verify the generated route registration resolves cleanly for `/logs` in preview.
+4. Re-check the published `.lovable.app` URL and the custom domain to confirm `/logs` no longer falls through to the global 404.
+5. If the published site is still stale after the route fix, instruct you to click Publish → Update once more, since frontend route changes only go live after a publish update.
 
-**`src/components/Breadcrumbs.tsx`** — uses `useLocation`, splits pathname into segments, maps each to a friendly label via a `LABELS` table (Leads, Accounts, Contacts, Opportunity Catalog, Matches, Approvals, Handoffs, Activities, Admin & Setup, Logs, Users, Roles, Workbench). UUID/numeric ID segments fall back to the `overrideLast` value passed by the page. Renders Home icon → crumbs separated by `ChevronRight`. Last crumb is plain text (current page); earlier crumbs are `<Link>`. Hidden on `/` (Dashboard). Mobile-safe: `overflow-x-auto`, `whitespace-nowrap`, last crumb truncates with `max-w-[60vw]`.
-
-## Edits
-
-**`src/components/PageHeader.tsx`** — render `<Breadcrumbs />` above the title row. Auto-applies to: Leads, Accounts, Contacts, Catalog, Matches, Approvals, Handoffs, Activities, Admin index, Admin sub-tables, Logs, Matches Workbench.
-
-**`src/components/DetailLayout.tsx`** — add optional `breadcrumbLabel?: string` prop, render `<Breadcrumbs overrideLast={breadcrumbLabel ?? title} />` above the title row. Since every detail page already passes a human-readable `title` (e.g. lead name, account name, "Handoff REC-123"), the last crumb auto-shows the record name with no per-page wiring needed. Auto-applies to: Lead, Account, Contact, Catalog, Match, Handoff, Activity detail pages.
-
-## Result
-
-```
-Leads list:        Home › Leads
-Lead detail:       Home › Leads › Acme Corp
-Admin → Users:     Home › Admin & Setup › Users
-Admin → table:     Home › Admin & Setup › Industry Segments
-Matches Workbench: Home › Matches › Workbench
-Logs:              Home › Logs
-Dashboard (/):     (hidden — root page)
-```
-
-No detail-page edits, no schema changes, fully responsive.
+## Technical details
+- File to change first: `src/routes/_app/logs/index.tsx`
+- Files to review for consistency:
+  - `src/components/AppShell.tsx`
+  - `src/components/Breadcrumbs.tsx`
+  - any admin shortcuts that link to `/logs`
+- Expected end state:
+  - route declaration and navigation both use `/logs`
+  - live published URL and custom domain both resolve `/logs` without showing the root 404 page
