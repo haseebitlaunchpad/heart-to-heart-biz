@@ -20,6 +20,7 @@ export const Route = createFileRoute("/_app/handoffs/")({ component: HandoffsLis
 function HandoffsList() {
   const qc = useQueryClient();
   const nav = useNavigate();
+  const [view, setView] = useState<"list" | "board">("list");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [open, setOpen] = useState(false);
