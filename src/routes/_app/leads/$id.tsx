@@ -250,33 +250,6 @@ function SubmitApprovalDialog({ open, onOpenChange, objectType, objectId }: { op
   );
 }
 
-function OverviewTab({ lead, update }: { lead: any; update: (p: any) => Promise<any> }) {
-  const [form, setForm] = useState<any>({
-    lead_name: lead.lead_name, company_name: lead.company_name ?? "",
-    email: lead.email ?? "", mobile: lead.mobile ?? "",
-    interest_notes: lead.interest_notes ?? "", investment_objective: lead.investment_objective ?? "",
-    cr_number: lead.cr_number ?? "", priority: lead.priority ?? "normal",
-  });
-  const [saving, setSaving] = useState(false);
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
-      {Object.entries(form).map(([k, v]) => (
-        <div key={k} className={k === "interest_notes" || k === "investment_objective" ? "md:col-span-2" : ""}>
-          <Label className="capitalize">{k.replaceAll("_", " ")}</Label>
-          {k === "interest_notes" || k === "investment_objective"
-            ? <Textarea value={v as any} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />
-            : <Input value={v as any} onChange={(e) => setForm({ ...form, [k]: e.target.value })} />}
-        </div>
-      ))}
-      <div className="md:col-span-2">
-        <Button disabled={saving} onClick={async () => {
-          setSaving(true);
-          try { await update(form); toast.success("Saved"); } finally { setSaving(false); }
-        }}>{saving ? "Saving…" : "Save changes"}</Button>
-      </div>
-    </div>
-  );
-}
 
 function MatchesPanel({ leadId }: { leadId: string }) {
   const { data = [] } = useQuery({
