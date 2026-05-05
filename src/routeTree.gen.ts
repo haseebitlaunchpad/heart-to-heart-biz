@@ -14,7 +14,6 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppLogsRouteImport } from './routes/_app.logs'
 import { Route as AppMatchesIndexRouteImport } from './routes/_app/matches/index'
-import { Route as AppLogsIndexRouteImport } from './routes/_app/logs/index'
 import { Route as AppLeadsIndexRouteImport } from './routes/_app/leads/index'
 import { Route as AppHandoffsIndexRouteImport } from './routes/_app/handoffs/index'
 import { Route as AppContactsIndexRouteImport } from './routes/_app/contacts/index'
@@ -58,11 +57,6 @@ const AppMatchesIndexRoute = AppMatchesIndexRouteImport.update({
   id: '/matches/',
   path: '/matches/',
   getParentRoute: () => AppRoute,
-} as any)
-const AppLogsIndexRoute = AppLogsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppLogsRoute,
 } as any)
 const AppLeadsIndexRoute = AppLeadsIndexRouteImport.update({
   id: '/leads/',
@@ -163,7 +157,7 @@ const AppAccountsIdRoute = AppAccountsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
-  '/logs': typeof AppLogsRouteWithChildren
+  '/logs': typeof AppLogsRoute
   '/accounts/$id': typeof AppAccountsIdRoute
   '/activities/$id': typeof AppActivitiesIdRoute
   '/admin/$table': typeof AppAdminTableRoute
@@ -183,11 +177,11 @@ export interface FileRoutesByFullPath {
   '/contacts/': typeof AppContactsIndexRoute
   '/handoffs/': typeof AppHandoffsIndexRoute
   '/leads/': typeof AppLeadsIndexRoute
-  '/logs/': typeof AppLogsIndexRoute
   '/matches/': typeof AppMatchesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/logs': typeof AppLogsRoute
   '/': typeof AppIndexRoute
   '/accounts/$id': typeof AppAccountsIdRoute
   '/activities/$id': typeof AppActivitiesIdRoute
@@ -208,14 +202,13 @@ export interface FileRoutesByTo {
   '/contacts': typeof AppContactsIndexRoute
   '/handoffs': typeof AppHandoffsIndexRoute
   '/leads': typeof AppLeadsIndexRoute
-  '/logs': typeof AppLogsIndexRoute
   '/matches': typeof AppMatchesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/_app/logs': typeof AppLogsRouteWithChildren
+  '/_app/logs': typeof AppLogsRoute
   '/_app/': typeof AppIndexRoute
   '/_app/accounts/$id': typeof AppAccountsIdRoute
   '/_app/activities/$id': typeof AppActivitiesIdRoute
@@ -236,7 +229,6 @@ export interface FileRoutesById {
   '/_app/contacts/': typeof AppContactsIndexRoute
   '/_app/handoffs/': typeof AppHandoffsIndexRoute
   '/_app/leads/': typeof AppLeadsIndexRoute
-  '/_app/logs/': typeof AppLogsIndexRoute
   '/_app/matches/': typeof AppMatchesIndexRoute
 }
 export interface FileRouteTypes {
@@ -264,11 +256,11 @@ export interface FileRouteTypes {
     | '/contacts/'
     | '/handoffs/'
     | '/leads/'
-    | '/logs/'
     | '/matches/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/logs'
     | '/'
     | '/accounts/$id'
     | '/activities/$id'
@@ -289,7 +281,6 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/handoffs'
     | '/leads'
-    | '/logs'
     | '/matches'
   id:
     | '__root__'
@@ -316,7 +307,6 @@ export interface FileRouteTypes {
     | '/_app/contacts/'
     | '/_app/handoffs/'
     | '/_app/leads/'
-    | '/_app/logs/'
     | '/_app/matches/'
   fileRoutesById: FileRoutesById
 }
@@ -361,13 +351,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/matches/'
       preLoaderRoute: typeof AppMatchesIndexRouteImport
       parentRoute: typeof AppRoute
-    }
-    '/_app/logs/': {
-      id: '/_app/logs/'
-      path: '/'
-      fullPath: '/logs/'
-      preLoaderRoute: typeof AppLogsIndexRouteImport
-      parentRoute: typeof AppLogsRoute
     }
     '/_app/leads/': {
       id: '/_app/leads/'
@@ -505,19 +488,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AppLogsRouteChildren {
-  AppLogsIndexRoute: typeof AppLogsIndexRoute
-}
-
-const AppLogsRouteChildren: AppLogsRouteChildren = {
-  AppLogsIndexRoute: AppLogsIndexRoute,
-}
-
-const AppLogsRouteWithChildren =
-  AppLogsRoute._addFileChildren(AppLogsRouteChildren)
-
 interface AppRouteChildren {
-  AppLogsRoute: typeof AppLogsRouteWithChildren
+  AppLogsRoute: typeof AppLogsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppAccountsIdRoute: typeof AppAccountsIdRoute
   AppActivitiesIdRoute: typeof AppActivitiesIdRoute
@@ -542,7 +514,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppLogsRoute: AppLogsRouteWithChildren,
+  AppLogsRoute: AppLogsRoute,
   AppIndexRoute: AppIndexRoute,
   AppAccountsIdRoute: AppAccountsIdRoute,
   AppActivitiesIdRoute: AppActivitiesIdRoute,
