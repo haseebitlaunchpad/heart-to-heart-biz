@@ -29,6 +29,7 @@ import { Route as AppHandoffsIdRouteImport } from './routes/_app/handoffs/$id'
 import { Route as AppContactsIdRouteImport } from './routes/_app/contacts/$id'
 import { Route as AppCatalogIdRouteImport } from './routes/_app/catalog/$id'
 import { Route as AppAdminTableRouteImport } from './routes/_app/admin/$table'
+import { Route as AppActivitiesIdRouteImport } from './routes/_app/activities/$id'
 import { Route as AppAccountsIdRouteImport } from './routes/_app/accounts/$id'
 
 const LoginRoute = LoginRouteImport.update({
@@ -130,6 +131,11 @@ const AppAdminTableRoute = AppAdminTableRouteImport.update({
   path: '/admin/$table',
   getParentRoute: () => AppRoute,
 } as any)
+const AppActivitiesIdRoute = AppActivitiesIdRouteImport.update({
+  id: '/activities/$id',
+  path: '/activities/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAccountsIdRoute = AppAccountsIdRouteImport.update({
   id: '/accounts/$id',
   path: '/accounts/$id',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
   '/accounts/$id': typeof AppAccountsIdRoute
+  '/activities/$id': typeof AppActivitiesIdRoute
   '/admin/$table': typeof AppAdminTableRoute
   '/catalog/$id': typeof AppCatalogIdRoute
   '/contacts/$id': typeof AppContactsIdRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/': typeof AppIndexRoute
   '/accounts/$id': typeof AppAccountsIdRoute
+  '/activities/$id': typeof AppActivitiesIdRoute
   '/admin/$table': typeof AppAdminTableRoute
   '/catalog/$id': typeof AppCatalogIdRoute
   '/contacts/$id': typeof AppContactsIdRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_app/': typeof AppIndexRoute
   '/_app/accounts/$id': typeof AppAccountsIdRoute
+  '/_app/activities/$id': typeof AppActivitiesIdRoute
   '/_app/admin/$table': typeof AppAdminTableRoute
   '/_app/catalog/$id': typeof AppCatalogIdRoute
   '/_app/contacts/$id': typeof AppContactsIdRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/accounts/$id'
+    | '/activities/$id'
     | '/admin/$table'
     | '/catalog/$id'
     | '/contacts/$id'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/'
     | '/accounts/$id'
+    | '/activities/$id'
     | '/admin/$table'
     | '/catalog/$id'
     | '/contacts/$id'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_app/'
     | '/_app/accounts/$id'
+    | '/_app/activities/$id'
     | '/_app/admin/$table'
     | '/_app/catalog/$id'
     | '/_app/contacts/$id'
@@ -421,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminTableRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/activities/$id': {
+      id: '/_app/activities/$id'
+      path: '/activities/$id'
+      fullPath: '/activities/$id'
+      preLoaderRoute: typeof AppActivitiesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/accounts/$id': {
       id: '/_app/accounts/$id'
       path: '/accounts/$id'
@@ -434,6 +453,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppAccountsIdRoute: typeof AppAccountsIdRoute
+  AppActivitiesIdRoute: typeof AppActivitiesIdRoute
   AppAdminTableRoute: typeof AppAdminTableRoute
   AppCatalogIdRoute: typeof AppCatalogIdRoute
   AppContactsIdRoute: typeof AppContactsIdRoute
@@ -456,6 +476,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppAccountsIdRoute: AppAccountsIdRoute,
+  AppActivitiesIdRoute: AppActivitiesIdRoute,
   AppAdminTableRoute: AppAdminTableRoute,
   AppCatalogIdRoute: AppCatalogIdRoute,
   AppContactsIdRoute: AppContactsIdRoute,
