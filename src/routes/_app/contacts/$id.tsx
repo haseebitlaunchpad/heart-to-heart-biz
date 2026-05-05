@@ -55,7 +55,7 @@ function ContactDetail() {
         </>}
         tabs={[
           { key: "overview", label: "Overview", render: () => <RecordEditor table="contacts" recordId={id} record={c} sections={schemas.contacts} queryKey={["contact", id]} /> },
-          { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
+          { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} relatedType="contact" /> },
           { key: "changes", label: "Changes", render: () => <ChangesTab objectType="contacts" objectId={id} /> },
           { key: "workflow", label: "Workflow", render: () => <WorkflowTab objectType="contacts" objectId={id} /> },
         ]}

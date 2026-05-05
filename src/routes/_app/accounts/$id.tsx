@@ -83,7 +83,7 @@ function AccountDetail() {
           { key: "contacts", label: "Contacts", render: () => <RelatedList table="contacts" filter={{ account_id: id }} columns={["record_number", "full_name", "job_title", "email", "mobile", "is_primary_contact"]} linkBase="/contacts" addLabel="Add Contact" addFields={[{key:"full_name",label:"Full name",required:true},{key:"job_title",label:"Job title"},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} primaryAction /> },
           { key: "leads", label: "Leads", render: () => <RelatedList table="leads" filter={{ linked_account_id: id }} columns={["record_number", "lead_name", "email", "mobile"]} linkBase="/leads" addLabel="New Lead" addFields={[{key:"lead_name",label:"Lead name",required:true},{key:"email",label:"Email"},{key:"mobile",label:"Mobile"}]} /> },
           { key: "matches", label: "Matches", render: () => <MatchesRelated accountId={id} /> },
-          { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
+          { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} relatedType="account" /> },
           { key: "changes", label: "Changes", render: () => <ChangesTab objectType="accounts" objectId={id} /> },
           { key: "workflow", label: "Workflow", render: () => <WorkflowTab objectType="accounts" objectId={id} /> },
         ]}

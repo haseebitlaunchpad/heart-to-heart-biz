@@ -122,7 +122,7 @@ function MatchDetail() {
             <ApprovalActions onApprove={approve} onReject={reject} onRequestInfo={requestInfo} />
           </div>
         )},
-        { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} /> },
+        { key: "activities", label: "Activities", render: () => <RelatedActivitiesTab relatedId={id} relatedType="opportunity_match" /> },
         { key: "changes", label: "Changes", render: () => <ChangesTab objectType="opportunity_matches" objectId={id} /> },
         { key: "workflow", label: "Workflow", render: () => <WorkflowTab objectType="opportunity_matches" objectId={id} /> },
       ]}
