@@ -1,9 +1,10 @@
 import { ReactNode, useState } from "react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export type TabDef = { key: string; label: string; render: () => ReactNode };
 
 export function DetailLayout({
-  title, subtitle, badges, summary, actions, tabs, defaultTab,
+  title, subtitle, badges, summary, actions, tabs, defaultTab, breadcrumbLabel,
 }: {
   title: string;
   subtitle?: ReactNode;
@@ -12,12 +13,14 @@ export function DetailLayout({
   actions?: ReactNode;
   tabs: TabDef[];
   defaultTab?: string;
+  breadcrumbLabel?: string;
 }) {
   const [active, setActive] = useState(defaultTab ?? tabs[0]?.key);
   const current = tabs.find((t) => t.key === active) ?? tabs[0];
   return (
     <div className="flex flex-col h-full">
-      <div className="border-b bg-card px-4 sm:px-6 py-4">
+      <div className="border-b bg-card px-4 sm:px-6 py-3 sm:py-4">
+        <Breadcrumbs overrideLast={breadcrumbLabel ?? title} />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <h1 className="text-lg sm:text-xl font-semibold break-words">{title}</h1>
