@@ -57,7 +57,7 @@ export function ActivityDrawer({
         due_date: dueDate || null,
         related_object_type: relatedType,
         related_object_id: relatedId,
-        owner_id: u.user?.id, created_by: u.user?.id,
+        owner_id: ownerId || u.user?.id, created_by: u.user?.id,
         completed_at: mode === "save_complete" ? new Date().toISOString() : null,
       };
       if (relatedType === "lead") payload.lead_id = relatedId;
