@@ -52,6 +52,11 @@ export const Route = createRootRoute({
         name: "twitter:description",
         content: "Manage leads, accounts, opportunities, approvals, and handoffs.",
       },
+      { name: "description", content: "Senaei CRM — manage leads, accounts, opportunities, approvals, and handoffs in one place" },
+      { property: "og:description", content: "Senaei CRM — manage leads, accounts, opportunities, approvals, and handoffs in one place" },
+      { name: "twitter:description", content: "Senaei CRM — manage leads, accounts, opportunities, approvals, and handoffs in one place" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/79f3cff6-0604-4b4c-a596-a7357ffe85f6/id-preview-2625a131--d05650e7-933e-46d2-9368-2e100f656fde.lovable.app-1778020158293.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/79f3cff6-0604-4b4c-a596-a7357ffe85f6/id-preview-2625a131--d05650e7-933e-46d2-9368-2e100f656fde.lovable.app-1778020158293.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
