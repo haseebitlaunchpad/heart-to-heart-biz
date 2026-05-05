@@ -107,6 +107,7 @@ function LeadDetail() {
             <Button size="sm" variant="outline" onClick={() => setSubmitOpen(true)}><Send className="h-4 w-4 mr-1" />Submit Approval</Button>
             <Button size="sm" variant="outline" onClick={() => setDisqOpen(true)}>Disqualify</Button>
             <Button size="sm" onClick={() => setConvertOpen(true)}><CheckCircle2 className="h-4 w-4 mr-1" />Convert</Button>
+            <DeleteRecordButton table="leads" recordId={id} recordNumber={lead.record_number} redirectTo="/leads" />
           </>
         }
         summary={
