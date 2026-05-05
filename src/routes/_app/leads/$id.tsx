@@ -15,7 +15,8 @@ import { ChangesTab, WorkflowTab, RelatedActivitiesTab } from "@/components/Rela
 import { ActivityDrawer } from "@/components/ActivityDrawer";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertTriangle, Repeat2, UserPlus, Plus } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Repeat2, UserPlus, Plus, Target, Send } from "lucide-react";
+import { createMatchFromLead, submitForApproval } from "@/lib/conversions";
 
 export const Route = createFileRoute("/_app/leads/$id")({ component: LeadDetail });
 
