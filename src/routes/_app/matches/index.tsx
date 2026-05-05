@@ -128,20 +128,39 @@ function MatchesList() {
             {(statuses as any[]).map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </FilterBar>
-        <div className="bg-card border rounded-lg">
-          {isLoading ? <div className="p-8 text-center text-muted-foreground">Loading…</div> :
-            <DataTable rows={filtered as any} linkBase="/matches" columns={[
-              { key: "record_number", header: "ID" },
-              { key: "catalog", header: "Opportunity", render: (r: any) => r.opportunity_catalog?.title ?? "—" },
-              { key: "subject", header: "Subject", render: (r: any) => r.leads?.lead_name ?? r.accounts?.account_name ?? "—" },
-              { key: "eligibility_result", header: "Eligibility", render: (r: any) => r.eligibility_result ?? "—" },
-              { key: "status", header: "Status", render: (r: any) => {
-                const s = (statuses as any[]).find((x) => x.id === r.match_status_id);
-                return <StatusBadge label={s?.name} color={s?.color} />;
-              } },
-            ]} />
-          }
-        </div>
+        {view === "list" ? (
+          <div className="bg-card border rounded-lg">
+            {isLoading ? <div className="p-8 text-center text-muted-foreground">Loading…</div> :
+              <DataTable rows={filtered as any} linkBase="/matches" columns={[
+                { key: "record_number", header: "ID" },
+                { key: "catalog", header: "Opportunity", render: (r: any) => r.opportunity_catalog?.title ?? "—" },
+                { key: "subject", header: "Subject", render: (r: any) => r.leads?.lead_name ?? r.accounts?.account_name ?? "—" },
+                { key: "eligibility_result", header: "Eligibility", render: (r: any) => r.eligibility_result ?? "—" },
+                { key: "status", header: "Status", render: (r: any) => {
+                  const s = (statuses as any[]).find((x) => x.id === r.match_status_id);
+                  return <StatusBadge label={s?.name} color={s?.color} />;
+                } },
+              ]} />
+            }
+          </div>
+        ) : (
+          <KanbanBoard
+            columns={(statuses as any[]).map((s) => ({ id: s.id, title: s.name, color: s.color }))}
+            cards={(filtered as any[]).map((r) => ({ id: r.id, columnId: r.match_status_id ?? "", title: r.opportunity_catalog?.title ?? r.record_number, subtitle: r.leads?.lead_name ?? r.accounts?.account_name, meta: r.record_number }))}
+            linkBase="/matches"
+            onCardMove={async (cardId, fromColId, toColId) => {
+              qc.setQueryData(["matches"], (old: any) =>
+                Array.isArray(old) ? old.map((r: any) => (r.id === cardId ? { ...r, match_status_id: toColId } : r)) : old
+              );
+              const fromCode = (statuses as any[]).find((s) => s.id === fromColId)?.code;
+              const toCode = (statuses as any[]).find((s) => s.id === toColId)?.code;
+              const { error } = await (supabase as any).from("opportunity_matches").update({ match_status_id: toColId }).eq("id", cardId);
+              if (error) { toast.error(error.message); qc.invalidateQueries({ queryKey: ["matches"] }); return; }
+              await writeWorkflowLog({ process: "match_status_change", objectType: "opportunity_matches", objectId: cardId, fromStatus: fromCode, toStatus: toCode, action: "drag_drop" });
+              toast.success(`Status → ${toCode}`);
+            }}
+          />
+        )}
         <div className="text-xs text-muted-foreground mt-2">{filtered.length} record(s)</div>
       </div>
     </>
